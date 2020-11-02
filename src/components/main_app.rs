@@ -28,7 +28,8 @@ pub struct MainApp {
     theme: SharedTheme,
     selected_tab: usize,
     pub containers: Vec<ContainerSummaryInner>,
-    pub images: Vec<ImageSummary>
+    pub images: Vec<ImageSummary>,
+    tx: Sender<docker::IOEvent>
 }
 
 impl MainApp {
@@ -36,8 +37,6 @@ impl MainApp {
         let theme = Arc::new(Theme::init());
 
         let tabs = get_tabs();
-        tx.send(IOEvent::RefreshContainers);
-        tx.send(IOEvent::RefreshImages);
 
         MainApp {
             should_quit: false,
@@ -45,11 +44,15 @@ impl MainApp {
             theme,
             selected_tab: 0,
             containers: vec![],
-            images: vec![]
+            images: vec![],
+            tx
         }
     }
 
-    fn update(&mut self) {}
+    fn update(&mut self) {
+        self.tx.send(IOEvent::RefreshImages);
+        self.tx.send(IOEvent::RefreshContainers);
+    }
     pub fn on_key(&mut self, c: char) {
         match c {
             'q' | 'x' => {

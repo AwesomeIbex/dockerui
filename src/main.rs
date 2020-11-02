@@ -38,7 +38,7 @@ fn main() -> Result<(), Error> {
         // shutdown_terminal().expect("shutdown failed");
     }
 
-    set_panic_handlers()?;
+    // set_panic_handlers()?;
 
     // Setup event handlers
     let config = Config {
@@ -80,6 +80,8 @@ fn set_panic_handlers() -> Result<(), Error> {
     // regular panic handler
     panic::set_hook(Box::new(|e| {
         let backtrace = Backtrace::new();
+        println!("{:?}", backtrace);
+
         log::error!("panic: {:?}\ntrace:\n{:?}", e, backtrace);
         // shutdown_terminal().expect("shutdown failed inside panic");
         eprintln!("panic: {:?}\ntrace:\n{:?}", e, backtrace);
@@ -89,6 +91,7 @@ fn set_panic_handlers() -> Result<(), Error> {
     rayon_core::ThreadPoolBuilder::new()
         .panic_handler(|e| {
             let backtrace = Backtrace::new();
+            println!("{:?}", backtrace);
             log::error!("panic: {:?}\ntrace:\n{:?}", e, backtrace);
             // shutdown_terminal()
             //     .expect("shutdown failed inside panic");

@@ -55,6 +55,7 @@ pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<
                 match containers {
                     Ok(containers) => {
                         let mut app = app.lock().unwrap();
+                        println!("containers: {:?}", containers);
                         app.containers = containers
                     }
                     Err(_) => {}
@@ -65,6 +66,7 @@ pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<
                 match images {
                     Ok(images) => {
                         let mut app = app.lock().unwrap();
+                        println!("images: {:?}", images);
                         app.images = images
                     }
                     Err(_) => {}
