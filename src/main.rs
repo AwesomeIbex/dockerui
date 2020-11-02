@@ -20,7 +20,7 @@ use tui::widgets::Tabs;
 use crate::style::{Theme, SharedTheme};
 use crate::components::util::Config;
 use crate::components::util::event::{Events, Event};
-use crate::components::main::MainApp;
+use crate::components::main_app::MainApp;
 
 mod style;
 mod components;

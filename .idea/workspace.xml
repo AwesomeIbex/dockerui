@@ -75,7 +75,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../dockerui_not-fromscratch" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/components" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="settings.editor.selected.configurable" value="language.rust.cargo" />
   </component>
@@ -84,8 +84,8 @@
       <recent name="$PROJECT_DIR$/src/components" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/components/utils" />
       <recent name="$PROJECT_DIR$/src/components" />
+      <recent name="$PROJECT_DIR$/src/components/utils" />
       <recent name="$PROJECT_DIR$/src/tabs" />
     </key>
   </component>
@@ -119,6 +119,10 @@
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="WindowStateProjectService">
+    <state x="1010" y="341" width="378" height="560" key="#com.intellij.ide.util.MemberChooser" timestamp="1604333874835">
+      <screen x="0" y="0" width="3440" height="1440" />
+    </state>
+    <state x="1010" y="341" width="378" height="560" key="#com.intellij.ide.util.MemberChooser/0.0.3440.1440@0.0.3440.1440" timestamp="1604333874835" />
     <state x="967" y="432" key="FileChooserDialogImpl" timestamp="1604329651564">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
@@ -143,6 +147,10 @@
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1244" y="309" key="SettingsEditor/0.0.3440.1440@0.0.3440.1440" timestamp="1604310487246" />
+    <state x="1611" y="41" width="1135" height="1319" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1604335108095">
+      <screen x="0" y="0" width="3440" height="1440" />
+    </state>
+    <state x="1611" y="41" width="1135" height="1319" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.3440.1440@0.0.3440.1440" timestamp="1604335108095" />
     <state x="1402" y="420" width="822" height="590" key="find.popup" timestamp="1604318936792">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>

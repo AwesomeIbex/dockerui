@@ -12,25 +12,27 @@ use tui::backend::Backend;
 use tui::layout::{Direction, Margin, Rect};
 use tui::widgets::canvas::{Canvas, Map, MapResolution, Rectangle};
 use tui::widgets::Tabs;
-
 use crate::components::util::event::Event;
 use crate::components::util::TabsState;
 use crate::style::{SharedTheme, Theme};
+use crate::components::{DrawableComponent, Tab, get_tabs};
+use crate::components::containers::Containers;
 
-pub struct MainApp<'a> {
+pub struct MainApp {
     should_quit: bool,
-    tabs: TabsState<'a>,
+    tab_state: TabsState,
     theme: SharedTheme,
     selected_tab: usize,
 }
 
-impl<'a> MainApp<'a> {
-    pub fn new() -> MainApp<'a> {
+impl MainApp {
+    pub fn new() -> MainApp {
         let theme = Rc::new(Theme::init());
 
+        let tabs = get_tabs();
         MainApp {
             should_quit: false,
-            tabs: TabsState::new(vec!["Main", "Stats", "Bulk", "Version"]), //Build tabs from dynamic list TODO
+            tab_state: TabsState::new(tabs), //Build tabs from dynamic list TODO
             theme,
             selected_tab: 0,
         }
@@ -39,7 +41,7 @@ impl<'a> MainApp<'a> {
     fn update(&mut self) {}
     pub fn on_key(&mut self, c: char) {
         match c {
-            'q' => {
+            'q' | 'x' => {
                 self.should_quit = true;
             }
             _ => {}
@@ -55,12 +57,12 @@ impl<'a> MainApp<'a> {
                 Key::Down => {}
                 Key::Up => {}
                 Key::Right => {
-                    self.tabs.next();
-                    self.selected_tab = self.tabs.index;
+                    self.tab_state.next();
+                    self.selected_tab = self.tab_state.index;
                 },
                 Key::Left => {
-                    self.tabs.previous();
-                    self.selected_tab = self.tabs.index;
+                    self.tab_state.previous();
+                    self.selected_tab = self.tab_state.index;
                 },
                 Key::Esc => {
                     self.should_quit = true;
@@ -92,24 +94,26 @@ impl<'a> MainApp<'a> {
         let block = Block::default().style(Style::default().bg(Color::Black).fg(Color::LightMagenta));
         f.render_widget(block, size);
 
-        self.draw_tabs(f, chunks[0]);
+        self.draw_tab_bar(f, chunks[0]);
 
 
         // TODO Get each tab title from the tab itself
-        let inner = Block::default().title(self.tabs.titles[self.selected_tab]).borders(Borders::ALL);
-        f.render_widget(inner, chunks[1]);
+        let tab = self.tab_state.get_current_tab();
+        tab.draw(f, chunks[1]);
+        // let inner = Block::default().title(tab.get_title()).borders(Borders::ALL);
+        // f.render_widget(inner, chunks[1]);
     }
 
-    fn draw_tabs<B: Backend>(&self, f: &mut Frame<B>, r: Rect) {
+    fn draw_tab_bar<B: Backend>(&self, f: &mut Frame<B>, r: Rect) {
         let r = r.inner(&Margin {
             vertical: 0,
             horizontal: 1,
         });
 
         let tabs = self
-            .tabs
-            .titles
+            .tab_state.tabs
             .iter()
+            .map(|e| e.get_title())
             .map(|t| {
                 let (first, rest) = t.split_at(1);
                 Spans::from(vec![
@@ -118,19 +122,6 @@ impl<'a> MainApp<'a> {
                 ])
             })
             .collect();
-
-        //TODO: this could all be fetched from something and define if its optional
-        // let tabs = [
-        //     Span::raw(strings::tab_status(&self.key_config)),
-        //     Span::raw(strings::tab_log(&self.key_config)),
-        //     Span::raw(strings::tab_stashing(&self.key_config)),
-        //     Span::raw(strings::tab_docker(&self.key_config)),
-        //     // Span::raw(strings::tab_stashes(&self.key_config)), TODO add tab here
-        // ]
-        //     .iter()
-        //     .cloned()
-        //     .map(Spans::from)
-        //     .collect();
 
         f.render_widget(
             Tabs::new(tabs)
