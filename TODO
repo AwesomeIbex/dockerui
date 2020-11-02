@@ -1,0 +1,9 @@
+
+
+TODO:
+
+Workflow:
+Setup an event stream for tokio & termion to share
+Periodically poll for changes
+When changes happen stream them from tokio to termion
+React to changes in the UI

@@ -22,6 +22,7 @@ use crate::components::util::Config;
 use crate::components::util::event::{Events, Event};
 use crate::components::main_app::MainApp;
 
+pub mod docker;
 mod style;
 mod components;
 
