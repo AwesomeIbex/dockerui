@@ -4,17 +4,16 @@ use tui::layout::Rect;
 use anyhow::Error;
 use tui::Frame;
 
-mod containers;
+mod containers_tab;
 
 pub enum Tab {
     Containers,
     Stats,
-    Bulk,
     Version
 }
 
 pub fn get_tabs() -> Vec<Tab> {
-    vec![Tab::Containers, Tab::Stats, Tab::Bulk, Tab::Version]
+    vec![Tab::Containers, Tab::Stats, Tab::Version]
 }
 
 impl Tab {
@@ -22,7 +21,6 @@ impl Tab {
         match self {
             Tab::Containers => "Containers",
             Tab::Stats => "Stats",
-            Tab::Bulk => "Bulk",
             Tab::Version => "Version",
         }
     }
@@ -31,9 +29,8 @@ impl Tab {
 impl DrawableComponent for Tab {
     fn draw<B: Backend>(&self, f: &mut Frame<B>, rect: Rect) -> Result<(), Error> {
         match self {
-            Tab::Containers => containers::Containers{}.draw(f, rect).unwrap(),
+            Tab::Containers => containers_tab::ContainersTab {}.draw(f, rect).unwrap(),
             Tab::Stats => {}
-            Tab::Bulk => {}
             Tab::Version => {}
         };
         Ok(())

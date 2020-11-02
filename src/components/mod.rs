@@ -6,6 +6,9 @@ use anyhow::Error;
 pub mod main_app;
 pub mod util;
 pub mod tabs;
+pub mod images;
+pub mod volumes;
+pub mod containers;
 
 pub trait DrawableComponent {
     ///
