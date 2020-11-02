@@ -242,7 +242,7 @@ impl Theme {
     }
 
     fn get_theme_file() -> Result<PathBuf> {
-        
+
         let app_home = get_app_config_path()?;
         Ok(app_home.join("dockeruitheme.ron"))
     }
