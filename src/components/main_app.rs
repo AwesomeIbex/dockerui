@@ -6,7 +6,6 @@ use anyhow::Error;
 use backtrace::Backtrace;
 use scopeguard::defer;
 use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
-use tokio::time::Duration;
 use tui::{backend::TermionBackend, Frame, layout::{Constraint, Layout}, style::{Color, Modifier, Style}, Terminal, text::{Span, Spans}, widgets::{Block, Borders, Row, Table, TableState}};
 use tui::backend::Backend;
 use tui::layout::{Direction, Margin, Rect};

@@ -10,7 +10,6 @@ use anyhow::Error;
 use backtrace::Backtrace;
 use scopeguard::defer;
 use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
-use tokio::time::Duration;
 use tui::{backend::TermionBackend, Frame, layout::{Constraint, Layout}, style::{Color, Modifier, Style}, Terminal, text::{Span, Spans}, widgets::{Block, Borders, Row, Table, TableState}};
 use tui::backend::Backend;
 use tui::layout::{Direction, Margin, Rect};
@@ -23,6 +22,7 @@ use crate::components::util::event::{Events, Event};
 use crate::components::main_app::MainApp;
 use std::sync::{Arc, Mutex};
 use clap::App;
+use std::time::Duration;
 
 pub mod docker;
 mod style;
@@ -31,7 +31,7 @@ mod components;
 fn main() -> Result<(), Error> {
     let stdout = io::stdout().into_raw_mode()?;
     let stdout = MouseTerminal::from(stdout);
-    let stdout = AlternateScreen::from(stdout);
+    // let stdout = AlternateScreen::from(stdout);
     let backend = TermionBackend::new(stdout);
 
     defer! {
