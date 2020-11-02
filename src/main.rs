@@ -21,6 +21,8 @@ use crate::style::{Theme, SharedTheme};
 use crate::components::util::Config;
 use crate::components::util::event::{Events, Event};
 use crate::components::main_app::MainApp;
+use std::sync::{Arc, Mutex};
+use clap::App;
 
 pub mod docker;
 mod style;
@@ -49,9 +51,19 @@ fn main() -> Result<(), Error> {
     terminal.hide_cursor()?;
     terminal.clear()?;
 
-    let mut app = MainApp::new();
+
+    let (tx, rx) = std::sync::mpsc::channel();
+
+    let app = Arc::new(Mutex::new(MainApp::new(tx)));
+
+    let cloned_app = Arc::clone(&app);
+    std::thread::spawn(move || {
+        // Send the receiving end of the channel into the network thread
+        docker::start_tokio(&app, rx);
+    });
 
     loop {
+        let mut app = cloned_app.lock().unwrap();
         terminal.draw(|f| {
             &app.draw(f);
         })?;

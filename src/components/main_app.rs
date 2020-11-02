@@ -1,5 +1,5 @@
 use std::rc::Rc;
-use std::sync::mpsc;
+use std::sync::{mpsc, Arc};
 
 use anyhow::anyhow;
 use anyhow::Error;
@@ -17,24 +17,35 @@ use crate::components::util::TabsState;
 use crate::style::{SharedTheme, Theme};
 use crate::components::{DrawableComponent};
 use crate::components::tabs::get_tabs;
+use bollard::service::{ContainerSummaryInner, ImageSummary};
+use std::sync::mpsc::Sender;
+use crate::docker;
+use crate::docker::IOEvent;
 
 pub struct MainApp {
     should_quit: bool,
     tab_state: TabsState,
     theme: SharedTheme,
     selected_tab: usize,
+    pub containers: Vec<ContainerSummaryInner>,
+    pub images: Vec<ImageSummary>
 }
 
 impl MainApp {
-    pub fn new() -> MainApp {
-        let theme = Rc::new(Theme::init());
+    pub fn new(tx: Sender<docker::IOEvent>) -> MainApp {
+        let theme = Arc::new(Theme::init());
 
         let tabs = get_tabs();
+        tx.send(IOEvent::RefreshContainers);
+        tx.send(IOEvent::RefreshImages);
+
         MainApp {
             should_quit: false,
             tab_state: TabsState::new(tabs), //Build tabs from dynamic list TODO
             theme,
             selected_tab: 0,
+            containers: vec![],
+            images: vec![]
         }
     }
 

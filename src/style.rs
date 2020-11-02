@@ -8,12 +8,12 @@ use std::{
     fs::File,
     io::{Read, Write},
     path::PathBuf,
-    rc::Rc,
 };
 use tui::style::{Color, Modifier, Style};
 use crate::get_app_config_path;
+use std::sync::Arc;
 
-pub type SharedTheme = Rc<Theme>;
+pub type SharedTheme = Arc<Theme>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Theme {
