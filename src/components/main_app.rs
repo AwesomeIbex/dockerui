@@ -15,8 +15,8 @@ use tui::widgets::Tabs;
 use crate::components::util::event::Event;
 use crate::components::util::TabsState;
 use crate::style::{SharedTheme, Theme};
-use crate::components::{DrawableComponent, Tab, get_tabs};
-use crate::components::containers::Containers;
+use crate::components::{DrawableComponent};
+use crate::components::tabs::get_tabs;
 
 pub struct MainApp {
     should_quit: bool,
@@ -99,7 +99,11 @@ impl MainApp {
 
         // TODO Get each tab title from the tab itself
         let tab = self.tab_state.get_current_tab();
-        tab.draw(f, chunks[1]);
+        let result = tab.draw(f, chunks[1]);
+        if result.is_err() {
+            //TODO change to err crate
+            println!("There was an error {:?}", result)
+        }
         // let inner = Block::default().title(tab.get_title()).borders(Borders::ALL);
         // f.render_widget(inner, chunks[1]);
     }
