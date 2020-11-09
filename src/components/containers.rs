@@ -21,9 +21,9 @@ impl MutableDrawableComponent for Containers {
             .map(|i| {
                 let id = i.names.as_ref().unwrap();
                 let mut lines = vec![]; //TODO remove this
-                for _ in 0..id.len() {
+                for index in 0..id.len() {
                     lines.push(Spans::from(Span::styled(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                        id[index].to_ascii_lowercase(),
                         Style::default().add_modifier(Modifier::ITALIC),
                     )));
                 }
