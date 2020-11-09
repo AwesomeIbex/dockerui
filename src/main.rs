@@ -2,12 +2,15 @@
 
 use std::{fs, io, panic, process};
 use std::io::Write;
+use std::panic::PanicInfo;
 use std::path::PathBuf;
-use std::rc::Rc;
+use std::sync::{Arc};
+use std::time::Duration;
 
 use anyhow::anyhow;
 use anyhow::Error;
 use backtrace::Backtrace;
+use clap::App;
 use scopeguard::defer;
 use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
 use tui::{backend::TermionBackend, Frame, layout::{Constraint, Layout}, style::{Color, Modifier, Style}, Terminal, text::{Span, Spans}, widgets::{Block, Borders, Row, Table, TableState}};
@@ -16,29 +19,73 @@ use tui::layout::{Direction, Margin, Rect};
 use tui::widgets::canvas::{Canvas, Map, MapResolution, Rectangle};
 use tui::widgets::Tabs;
 
-use crate::style::{Theme, SharedTheme};
-use crate::components::util::Config;
-use crate::components::util::event::{Events, Event};
 use crate::components::main_app::MainApp;
-use std::sync::{Arc, Mutex};
-use clap::App;
-use std::time::Duration;
+use crate::components::util::Config;
+use crate::components::util::event::{Event, Events};
+use crate::style::{SharedTheme, Theme};
+use tokio::sync::Mutex;
 
 pub mod docker;
 mod style;
 mod components;
 
-fn main() -> Result<(), Error> {
-    pretty_env_logger::init();
+fn panic_hook(info: &PanicInfo<'_>) {
+    if cfg!(debug_assertions) {
+        let location = info.location().unwrap();
 
+        let msg = match info.payload().downcast_ref::<&'static str>() {
+            Some(s) => *s,
+            None => match info.payload().downcast_ref::<String>() {
+                Some(s) => &s[..],
+                None => "Box<Any>",
+            },
+        };
+
+        let stacktrace: String = format!("{:?}", Backtrace::new()).replace('\n', "\n\r");
+        println!("{}", stacktrace);
+        //TODO shut down the terminal
+    //     execute!(
+    //   io::stdout(),
+    //   LeaveAlternateScreen,
+    //   Print(format!(
+    //     "thread '<unnamed>' panicked at '{}', {}\n\r{}",
+    //     msg, location, stacktrace
+    //   )),
+    //   DisableMouseCapture
+    // )
+    //         .unwrap();
+    }
+}
+
+#[tokio::main]
+async fn main() -> Result<(), Error> {
+    panic::set_hook(Box::new(|info| {
+        panic_hook(info);
+    }));
+
+    // pretty_env_logger::init();
+
+    let (tx, rx) = std::sync::mpsc::channel();
+
+    let app = Arc::new(Mutex::new(MainApp::new(tx)));
+
+    let cloned_app = Arc::clone(&app);
+    std::thread::spawn(move || {
+        pretty_env_logger::init();
+
+        println!("Send the receiving end of the channel into the network thread");
+        docker::start_tokio(&app, rx);
+    });
+
+    start_ui(&cloned_app).await?;
+    Ok(())
+}
+
+async fn start_ui(app: &Arc<Mutex<MainApp>>) -> Result<(), Error> {
     let stdout = io::stdout().into_raw_mode()?;
     let stdout = MouseTerminal::from(stdout);
     // let stdout = AlternateScreen::from(stdout); //TODO to enable the tui but with logs
     let backend = TermionBackend::new(stdout);
-
-    // defer! {
-        // shutdown_terminal().expect("shutdown failed");
-    // }
 
     // set_panic_handlers()?;
 
@@ -53,20 +100,8 @@ fn main() -> Result<(), Error> {
     terminal.hide_cursor()?;
     terminal.clear()?;
 
-
-    let (tx, rx) = std::sync::mpsc::channel();
-
-    let app = Arc::new(Mutex::new(MainApp::new(tx)));
-
-    let cloned_app = Arc::clone(&app);
-    log::info!("starting tokio");
-    std::thread::spawn(move || {
-        println!("Send the receiving end of the channel into the network thread");
-        docker::start_tokio(&app, rx);
-    });
-
     loop {
-        let mut app = cloned_app.lock().unwrap();
+        let mut app = app.lock().await;
         terminal.draw(|f| {
             &app.draw(f);
         })?;
@@ -76,6 +111,7 @@ fn main() -> Result<(), Error> {
             break;
         };
     }
+
     Ok(())
 }
 

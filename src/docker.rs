@@ -1,6 +1,6 @@
 use std::collections::hash_map::RandomState;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc};
 use std::thread::{Thread, yield_now};
 
 use bollard::container::ListContainersOptions;
@@ -11,6 +11,7 @@ use bollard::service::{ContainerSummaryInner, ImageSummary};
 use tokio::time::{Duration, Instant};
 
 use crate::components::main_app::MainApp;
+use tokio::sync::Mutex;
 
 // TODO: could be memoized or static
 #[cfg(unix)]
@@ -55,7 +56,7 @@ pub enum IOEvent {
 
 // Receive a message and handle it
 #[tokio::main]
-pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<IOEvent>) {
+pub async fn start_tokio(app: &Arc<Mutex<MainApp>>, io_rx: std::sync::mpsc::Receiver<IOEvent>) {
     while let Ok(event) = io_rx.recv() {
         log::info!("Received event in loop {:?}", event);
         match event {
@@ -63,8 +64,9 @@ pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<
                 let containers = get_containers().await;
                 match containers {
                     Ok(containers) => {
-                        let mut app = app.lock().unwrap();
-                        log::info!("Containers: {:?}", containers);
+                        log::info!("hahahaha");
+                        let mut app = app.lock().await;
+                        log::info!("Containers: {:?}", containers.len());
                         app.containers = containers;
                     }
                     Err(err) => {
@@ -76,7 +78,8 @@ pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<
                 let images = get_images().await;
                 match images {
                     Ok(images) => {
-                        let mut app = app.lock().unwrap();
+                        log::info!("hahahaha2");
+                        let mut app = app.lock().await;
                         log::info!("Images: {:?}", images.len());
                         app.images = images;
                     }
@@ -86,6 +89,6 @@ pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<
                 }
             }
         }
-        tokio::time::delay_for(Duration::from_millis(100)).await;
+        // tokio::time::delay_for(Duration::from_millis(100)).await;
     };
 }

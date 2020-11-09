@@ -1,9 +1,11 @@
 use std::rc::Rc;
-use std::sync::{mpsc, Arc};
+use std::sync::{Arc, mpsc};
+use std::sync::mpsc::Sender;
 
 use anyhow::anyhow;
 use anyhow::Error;
 use backtrace::Backtrace;
+use bollard::service::{ContainerSummaryInner, ImageSummary};
 use scopeguard::defer;
 use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
 use tui::{backend::TermionBackend, Frame, layout::{Constraint, Layout}, style::{Color, Modifier, Style}, Terminal, text::{Span, Spans}, widgets::{Block, Borders, Row, Table, TableState}};
@@ -11,15 +13,14 @@ use tui::backend::Backend;
 use tui::layout::{Direction, Margin, Rect};
 use tui::widgets::canvas::{Canvas, Map, MapResolution, Rectangle};
 use tui::widgets::Tabs;
+
+use crate::components::DrawableComponent;
+use crate::components::tabs::get_tabs;
 use crate::components::util::event::Event;
 use crate::components::util::TabsState;
-use crate::style::{SharedTheme, Theme};
-use crate::components::{DrawableComponent};
-use crate::components::tabs::get_tabs;
-use bollard::service::{ContainerSummaryInner, ImageSummary};
-use std::sync::mpsc::Sender;
 use crate::docker;
 use crate::docker::IOEvent;
+use crate::style::{SharedTheme, Theme};
 
 pub struct MainApp {
     should_quit: bool,
@@ -28,7 +29,7 @@ pub struct MainApp {
     selected_tab: usize,
     pub containers: Vec<ContainerSummaryInner>,
     pub images: Vec<ImageSummary>,
-    tx: Sender<docker::IOEvent>
+    tx: Sender<docker::IOEvent>,
 }
 
 impl MainApp {
@@ -44,16 +45,19 @@ impl MainApp {
             selected_tab: 0,
             containers: vec![],
             images: vec![],
-            tx
+            tx,
         }
     }
 
     fn update(&mut self) {
-        if let Err(err) = self.tx.send(IOEvent::RefreshImages) {
-            log::error!("Failed to send the message to refresh images, {}", err)
+        match self.tx.send(IOEvent::RefreshImages) {
+            Ok(_) => print!("x1"),
+            Err(err) => log::error!("Failed to send the message to refresh images, {}", err)
         }
-        if let Err(err) = self.tx.send(IOEvent::RefreshContainers) {
-            log::error!("Failed to send the message to refresh containers, {}", err)
+
+        match self.tx.send(IOEvent::RefreshContainers) {
+            Ok(_) => print!("x2"),
+            Err(err) => log::error!("Failed to send the message to refresh containers, {}", err)
         }
     }
 
@@ -68,7 +72,7 @@ impl MainApp {
 
     pub fn handle_event(&mut self, event: Result<Event<Key>, mpsc::RecvError>) -> Result<bool, Error> {
         let event = event?;
-        // log::info!("Handling event {:#?}", event);
+        print!("{:#?}#", event);
         match event {
             Event::Input(input) => match input {
                 Key::Char(c) => {
@@ -79,11 +83,11 @@ impl MainApp {
                 Key::Right => {
                     self.tab_state.next();
                     self.selected_tab = self.tab_state.index;
-                },
+                }
                 Key::Left => {
                     self.tab_state.previous();
                     self.selected_tab = self.tab_state.index;
-                },
+                }
                 Key::Esc => {
                     self.should_quit = true;
                 }
