@@ -39,33 +39,6 @@
   <component name="MacroExpansionManager">
     <option name="directoryName" value="fzww9lz9" />
   </component>
-  <component name="MakefileLocalSettings">
-    <option name="availableProjects">
-      <map>
-        <entry>
-          <key>
-            <ExternalProjectPojo>
-              <option name="name" value="dockerui" />
-              <option name="path" value="$PROJECT_DIR$" />
-            </ExternalProjectPojo>
-          </key>
-          <value>
-            <list>
-              <ExternalProjectPojo>
-                <option name="name" value="dockerui" />
-                <option name="path" value="$PROJECT_DIR$" />
-              </ExternalProjectPojo>
-            </list>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="projectSyncType">
-      <map>
-        <entry key="$PROJECT_DIR$" value="RE_IMPORT" />
-      </map>
-    </option>
-  </component>
   <component name="ProjectId" id="1jjEmLQac1rCR1Y25B5KASicuYK" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -90,11 +63,6 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Run dockerui" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="run --package dockerui --bin dockerui" />
@@ -116,13 +84,10 @@
   <component name="RustProjectSettings">
     <option name="runExternalLinterOnTheFly" value="true" />
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+    <option name="version" value="2" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="WindowStateProjectService">
-    <state x="853" y="479" width="700" height="388" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1604337718724">
-      <screen x="0" y="0" width="3440" height="1440" />
-    </state>
-    <state x="853" y="479" width="700" height="388" key="#com.intellij.fileTypes.FileTypeChooser/0.0.3440.1440@0.0.3440.1440" timestamp="1604337718724" />
     <state x="1008" y="315" width="378" height="560" key="#com.intellij.ide.util.MemberChooser" timestamp="1604336782817">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
@@ -131,54 +96,34 @@
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="967" y="432" key="FileChooserDialogImpl/0.0.3440.1440@0.0.3440.1440" timestamp="1604329651564" />
-    <state width="1652" height="451" key="GridCell.Tab.0.bottom" timestamp="1604341562659">
+    <state width="2340" height="367" key="GridCell.Tab.0.bottom" timestamp="1604335632100">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="1652" height="451" key="GridCell.Tab.0.bottom/0.0.3440.1440@0.0.3440.1440" timestamp="1604341562659" />
-    <state width="1652" height="451" key="GridCell.Tab.0.center" timestamp="1604341562659">
+    <state width="2340" height="367" key="GridCell.Tab.0.bottom/0.0.3440.1440@0.0.3440.1440" timestamp="1604335632100" />
+    <state width="2340" height="367" key="GridCell.Tab.0.center" timestamp="1604335632100">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="1652" height="451" key="GridCell.Tab.0.center/0.0.3440.1440@0.0.3440.1440" timestamp="1604341562659" />
-    <state width="1652" height="451" key="GridCell.Tab.0.left" timestamp="1604341562659">
+    <state width="2340" height="367" key="GridCell.Tab.0.center/0.0.3440.1440@0.0.3440.1440" timestamp="1604335632100" />
+    <state width="2340" height="367" key="GridCell.Tab.0.left" timestamp="1604335632099">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="1652" height="451" key="GridCell.Tab.0.left/0.0.3440.1440@0.0.3440.1440" timestamp="1604341562659" />
-    <state width="1652" height="451" key="GridCell.Tab.0.right" timestamp="1604341562659">
+    <state width="2340" height="367" key="GridCell.Tab.0.left/0.0.3440.1440@0.0.3440.1440" timestamp="1604335632099" />
+    <state width="2340" height="367" key="GridCell.Tab.0.right" timestamp="1604335632100">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state width="1652" height="451" key="GridCell.Tab.0.right/0.0.3440.1440@0.0.3440.1440" timestamp="1604341562659" />
-    <state width="1652" height="451" key="GridCell.Tab.1.bottom" timestamp="1604341563444">
-      <screen x="0" y="0" width="3440" height="1440" />
-    </state>
-    <state width="1652" height="451" key="GridCell.Tab.1.bottom/0.0.3440.1440@0.0.3440.1440" timestamp="1604341563444" />
-    <state width="1652" height="451" key="GridCell.Tab.1.center" timestamp="1604341563443">
-      <screen x="0" y="0" width="3440" height="1440" />
-    </state>
-    <state width="1652" height="451" key="GridCell.Tab.1.center/0.0.3440.1440@0.0.3440.1440" timestamp="1604341563443" />
-    <state width="1652" height="451" key="GridCell.Tab.1.left" timestamp="1604341563443">
-      <screen x="0" y="0" width="3440" height="1440" />
-    </state>
-    <state width="1652" height="451" key="GridCell.Tab.1.left/0.0.3440.1440@0.0.3440.1440" timestamp="1604341563443" />
-    <state width="1652" height="451" key="GridCell.Tab.1.right" timestamp="1604341563444">
-      <screen x="0" y="0" width="3440" height="1440" />
-    </state>
-    <state width="1652" height="451" key="GridCell.Tab.1.right/0.0.3440.1440@0.0.3440.1440" timestamp="1604341563444" />
+    <state width="2340" height="367" key="GridCell.Tab.0.right/0.0.3440.1440@0.0.3440.1440" timestamp="1604335632100" />
     <state x="1244" y="309" key="SettingsEditor" timestamp="1604310487246">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1244" y="309" key="SettingsEditor/0.0.3440.1440@0.0.3440.1440" timestamp="1604310487246" />
-    <state width="498" height="446" key="SwitcherDM" timestamp="1604341579274">
-      <screen x="0" y="0" width="3440" height="1440" />
-    </state>
-    <state width="498" height="446" key="SwitcherDM/0.0.3440.1440@0.0.3440.1440" timestamp="1604341579274" />
     <state x="1611" y="41" width="1135" height="1319" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1604335108095">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1611" y="41" width="1135" height="1319" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.3440.1440@0.0.3440.1440" timestamp="1604335108095" />
-    <state x="1402" y="420" width="822" height="590" key="find.popup" timestamp="1604341338707">
+    <state x="1402" y="420" width="822" height="590" key="find.popup" timestamp="1604318936792">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state x="1402" y="420" width="822" height="590" key="find.popup/0.0.3440.1440@0.0.3440.1440" timestamp="1604341338707" />
+    <state x="1402" y="420" width="822" height="590" key="find.popup/0.0.3440.1440@0.0.3440.1440" timestamp="1604318936792" />
     <state x="1054" y="580" width="1327" height="202" key="makefile.clean.confirm.dialog" timestamp="1604309267294">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
@@ -187,26 +132,5 @@
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1383" y="339" width="672" height="678" key="search.everywhere.popup/0.0.3440.1440@0.0.3440.1440" timestamp="1604318132224" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/main.rs</url>
-          <line>61</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$USER_HOME$/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.22/src/time/driver/handle.rs</url>
-          <line>23</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$USER_HOME$/.cargo/registry/src/github.com-1ecc6299db9ec823/bollard-0.8.0/src/docker.rs</url>
-          <line>946</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>
