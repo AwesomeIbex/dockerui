@@ -19,19 +19,21 @@ impl MutableDrawableComponent for Containers {
         let items: Vec<ListItem> = app.containers
             .iter()
             .map(|i| {
-                let id = i.names.as_ref().unwrap();
-                let mut lines = vec![]; //TODO remove this
-                for index in 0..id.len() {
+                let names = i.names.as_ref().unwrap();
+                let mut lines = vec![];
+
+                names.iter().for_each(|name| {
                     lines.push(Spans::from(Span::styled(
-                        id[index].to_ascii_lowercase(),
+                        name,
                         Style::default().add_modifier(Modifier::ITALIC),
                     )));
-                }
+                });
                 ListItem::new(lines).style(Style::default().fg(Color::Black).bg(Color::White))
             })
             .collect();
+
         let items = List::new(items)
-            .block(Block::default().borders(Borders::ALL).title("List"))
+            .block(Block::default().borders(Borders::ALL).title("Containers"))
             .highlight_style(
                 Style::default()
                     .bg(Color::LightGreen)
@@ -40,11 +42,6 @@ impl MutableDrawableComponent for Containers {
             .highlight_symbol(">> ");
         f.render_stateful_widget(items, rect, &mut self.items.state);
 
-        // f.render_widget(
-        //     Paragraph::new("Container list")
-        //         .block(Block::default().borders(Borders::ALL).title("Containers"))
-        //         .alignment(Alignment::Left),
-        //     rect);
         Ok(())
     }
 }
