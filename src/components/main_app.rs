@@ -49,7 +49,7 @@ impl MainApp {
     }
 
     fn update(&mut self) {
-        self.tx.send(IOEvent::RefreshImages);
+        // self.tx.send(IOEvent::RefreshImages);
         self.tx.send(IOEvent::RefreshContainers);
     }
     pub fn on_key(&mut self, c: char) {

@@ -7,6 +7,7 @@ use bollard::service::{ImageSummary, ContainerSummaryInner};
 use bollard::container::ListContainersOptions;
 use std::sync::{Arc, Mutex};
 use crate::components::main_app::MainApp;
+use std::collections::hash_map::RandomState;
 
 // TODO: could be memoized or static
 #[cfg(unix)]
@@ -17,8 +18,8 @@ fn get_client() -> Result<Docker, Error> {
 
 //TODO send to UI thread https://github.com/daboross/screeps-rs/tree/master/network/src/tokio
 pub async fn get_images() -> Result<Vec<ImageSummary>, Error> {
-    let mut filters = HashMap::new();
-    filters.insert("dangling", vec!["true"]);
+    let mut filters: HashMap<&str, Vec<&str>, RandomState> = HashMap::new();
+    // filters.insert("dangling", vec!["true"]);
 
     let options = Some(ListImagesOptions {
         all: true,
@@ -30,11 +31,13 @@ pub async fn get_images() -> Result<Vec<ImageSummary>, Error> {
 
 //TODO send to UI thread https://github.com/daboross/screeps-rs/tree/master/network/src/tokio
 pub async fn get_containers() -> Result<Vec<ContainerSummaryInner>, Error> {
-    let mut filters = HashMap::new();
-    filters.insert("dangling", vec!["true"]);
+    let mut filters: HashMap<&str, Vec<&str>, RandomState> = HashMap::new();
+    // filters.insert("dangling", vec!["true"]);
+    // filters.insert("status", vec!["running"]);
+
 
     let options = Some(ListContainersOptions {
-        all: true,
+        all: false,
         filters,
         ..Default::default()
     });
@@ -55,10 +58,12 @@ pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<
                 match containers {
                     Ok(containers) => {
                         let mut app = app.lock().unwrap();
-                        println!("containers: {:?}", containers);
+                        println!("containers: {:#?}", containers);
                         app.containers = containers
                     }
-                    Err(_) => {}
+                    Err(err) => {
+                        println!("some error, {:?}", err)
+                    }
                 }
             }
             IOEvent::RefreshImages => {
@@ -66,7 +71,7 @@ pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<
                 match images {
                     Ok(images) => {
                         let mut app = app.lock().unwrap();
-                        println!("images: {:?}", images);
+                        // println!("images: {:?}", images);
                         app.images = images
                     }
                     Err(_) => {}
