@@ -63,7 +63,7 @@ async fn main() -> Result<(), Error> {
         panic_hook(info);
     }));
 
-    // pretty_env_logger::init();
+    pretty_env_logger::init();
 
     let (tx, rx) = std::sync::mpsc::channel();
 
@@ -71,9 +71,6 @@ async fn main() -> Result<(), Error> {
 
     let cloned_app = Arc::clone(&app);
     std::thread::spawn(move || {
-        pretty_env_logger::init();
-
-        println!("Send the receiving end of the channel into the network thread");
         docker::start_tokio(&app, rx);
     });
 

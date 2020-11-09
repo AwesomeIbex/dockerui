@@ -58,15 +58,14 @@ pub enum IOEvent {
 #[tokio::main]
 pub async fn start_tokio(app: &Arc<Mutex<MainApp>>, io_rx: std::sync::mpsc::Receiver<IOEvent>) {
     while let Ok(event) = io_rx.recv() {
-        log::info!("Received event in loop {:?}", event);
+        log::debug!("Received event in loop {:?}", event);
         match event {
             IOEvent::RefreshContainers => {
                 let containers = get_containers().await;
                 match containers {
                     Ok(containers) => {
-                        log::info!("hahahaha");
                         let mut app = app.lock().await;
-                        log::info!("Containers: {:?}", containers.len());
+                        log::debug!("Containers: {:?}", containers);
                         app.containers = containers;
                     }
                     Err(err) => {
@@ -78,9 +77,8 @@ pub async fn start_tokio(app: &Arc<Mutex<MainApp>>, io_rx: std::sync::mpsc::Rece
                 let images = get_images().await;
                 match images {
                     Ok(images) => {
-                        log::info!("hahahaha2");
                         let mut app = app.lock().await;
-                        log::info!("Images: {:?}", images.len());
+                        log::debug!("Images: {:?}", images);
                         app.images = images;
                     }
                     Err(err) => {
@@ -89,6 +87,5 @@ pub async fn start_tokio(app: &Arc<Mutex<MainApp>>, io_rx: std::sync::mpsc::Rece
                 }
             }
         }
-        // tokio::time::delay_for(Duration::from_millis(100)).await;
     };
 }
