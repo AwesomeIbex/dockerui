@@ -63,6 +63,11 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Run dockerui" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="run --package dockerui --bin dockerui" />
@@ -73,11 +78,6 @@
       <envs />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
@@ -125,10 +125,10 @@
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1611" y="41" width="1135" height="1319" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.3440.1440@0.0.3440.1440" timestamp="1604335108095" />
-    <state x="1402" y="420" width="822" height="590" key="find.popup" timestamp="1604318936792">
+    <state x="1402" y="420" width="822" height="590" key="find.popup" timestamp="1604954146255">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state x="1402" y="420" width="822" height="590" key="find.popup/0.0.3440.1440@0.0.3440.1440" timestamp="1604318936792" />
+    <state x="1402" y="420" width="822" height="590" key="find.popup/0.0.3440.1440@0.0.3440.1440" timestamp="1604954146255" />
     <state x="1054" y="580" width="1327" height="202" key="makefile.clean.confirm.dialog" timestamp="1604309267294">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>

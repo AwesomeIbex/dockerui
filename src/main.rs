@@ -29,14 +29,16 @@ mod style;
 mod components;
 
 fn main() -> Result<(), Error> {
+    pretty_env_logger::init();
+
     let stdout = io::stdout().into_raw_mode()?;
     let stdout = MouseTerminal::from(stdout);
-    // let stdout = AlternateScreen::from(stdout);
+    // let stdout = AlternateScreen::from(stdout); //TODO to enable the tui but with logs
     let backend = TermionBackend::new(stdout);
 
-    defer! {
+    // defer! {
         // shutdown_terminal().expect("shutdown failed");
-    }
+    // }
 
     // set_panic_handlers()?;
 
@@ -57,8 +59,9 @@ fn main() -> Result<(), Error> {
     let app = Arc::new(Mutex::new(MainApp::new(tx)));
 
     let cloned_app = Arc::clone(&app);
+    log::info!("starting tokio");
     std::thread::spawn(move || {
-        // Send the receiving end of the channel into the network thread
+        println!("Send the receiving end of the channel into the network thread");
         docker::start_tokio(&app, rx);
     });
 

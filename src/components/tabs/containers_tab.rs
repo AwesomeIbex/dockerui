@@ -4,16 +4,16 @@ use tui::Frame;
 use tui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use tui::widgets::{Block, Borders, Paragraph};
 
-use crate::components::DrawableComponent;
-use crate::components::images;
+use crate::components::{DrawableComponent, MutableDrawableComponent};
 use crate::components::images::Images;
 use crate::components::containers::Containers;
 use crate::components::volumes::Volumes;
+use crate::components::main_app::MainApp;
 
 pub struct ContainersTab {}
 
 impl DrawableComponent for ContainersTab {
-    fn draw<B: Backend>(&self, f: &mut Frame<B>, rect: Rect) -> Result<(), Error> {
+    fn draw<B: Backend>(&self, f: &mut Frame<B>, rect: Rect, app: &MainApp) -> Result<(), Error> {
         let right_chunks = Layout::default()
             .direction(Direction::Horizontal)
             .constraints(
@@ -43,14 +43,14 @@ impl DrawableComponent for ContainersTab {
                 .alignment(Alignment::Left),
             right_chunks[1]);
 
-        let containers = Containers::new();
-        containers.draw(f, left_chunks[0])?;
+        let mut containers = Containers::new();
+        containers.draw(f, left_chunks[0], app)?;
 
         let images = Images::new();
-        images.draw(f, left_chunks[1])?;
+        images.draw(f, left_chunks[1], app)?;
 
         let volumes = Volumes::new();
-        volumes.draw(f, left_chunks[2])?;
+        volumes.draw(f, left_chunks[2], app)?;
 
         Ok(())
     }

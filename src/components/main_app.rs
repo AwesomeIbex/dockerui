@@ -49,9 +49,14 @@ impl MainApp {
     }
 
     fn update(&mut self) {
-        // self.tx.send(IOEvent::RefreshImages);
-        self.tx.send(IOEvent::RefreshContainers);
+        if let Err(err) = self.tx.send(IOEvent::RefreshImages) {
+            log::error!("Failed to send the message to refresh images, {}", err)
+        }
+        if let Err(err) = self.tx.send(IOEvent::RefreshContainers) {
+            log::error!("Failed to send the message to refresh containers, {}", err)
+        }
     }
+
     pub fn on_key(&mut self, c: char) {
         match c {
             'q' | 'x' => {
@@ -62,7 +67,9 @@ impl MainApp {
     }
 
     pub fn handle_event(&mut self, event: Result<Event<Key>, mpsc::RecvError>) -> Result<bool, Error> {
-        match event? {
+        let event = event?;
+        // log::info!("Handling event {:#?}", event);
+        match event {
             Event::Input(input) => match input {
                 Key::Char(c) => {
                     self.on_key(c);
@@ -112,7 +119,7 @@ impl MainApp {
 
         // TODO Get each tab title from the tab itself
         let tab = self.tab_state.get_current_tab();
-        let result = tab.draw(f, chunks[1]);
+        let result = tab.draw(f, chunks[1], self);
         if result.is_err() {
             //TODO change to err crate
             println!("There was an error {:?}", result)

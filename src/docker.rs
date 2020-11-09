@@ -1,13 +1,16 @@
+use std::collections::hash_map::RandomState;
 use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+use std::thread::{Thread, yield_now};
 
+use bollard::container::ListContainersOptions;
 use bollard::Docker;
 use bollard::errors::Error;
 use bollard::image::ListImagesOptions;
-use bollard::service::{ImageSummary, ContainerSummaryInner};
-use bollard::container::ListContainersOptions;
-use std::sync::{Arc, Mutex};
+use bollard::service::{ContainerSummaryInner, ImageSummary};
+use tokio::time::{Duration, Instant};
+
 use crate::components::main_app::MainApp;
-use std::collections::hash_map::RandomState;
 
 // TODO: could be memoized or static
 #[cfg(unix)]
@@ -44,25 +47,28 @@ pub async fn get_containers() -> Result<Vec<ContainerSummaryInner>, Error> {
     get_client()?.list_containers(options).await
 }
 
+#[derive(Debug)]
 pub enum IOEvent {
     RefreshContainers,
-    RefreshImages
+    RefreshImages,
 }
+
 // Receive a message and handle it
 #[tokio::main]
 pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<IOEvent>) {
     while let Ok(event) = io_rx.recv() {
+        log::info!("Received event in loop {:?}", event);
         match event {
             IOEvent::RefreshContainers => {
                 let containers = get_containers().await;
                 match containers {
                     Ok(containers) => {
                         let mut app = app.lock().unwrap();
-                        println!("containers: {:#?}", containers);
-                        app.containers = containers
+                        log::info!("Containers: {:?}", containers);
+                        app.containers = containers;
                     }
                     Err(err) => {
-                        println!("some error, {:?}", err)
+                        log::error!("There was an error retrieving containers, {}", err);
                     }
                 }
             }
@@ -71,12 +77,15 @@ pub async fn start_tokio(app: &Mutex<MainApp>, io_rx: std::sync::mpsc::Receiver<
                 match images {
                     Ok(images) => {
                         let mut app = app.lock().unwrap();
-                        // println!("images: {:?}", images);
-                        app.images = images
+                        log::info!("Images: {:?}", images.len());
+                        app.images = images;
                     }
-                    Err(_) => {}
+                    Err(err) => {
+                        log::error!("There was an error retrieving images, {:?}", err);
+                    }
                 }
             }
         }
-    }
+        tokio::time::delay_for(Duration::from_millis(100)).await;
+    };
 }
