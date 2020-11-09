@@ -1,6 +1,7 @@
 use anyhow::Error;
 use bollard::models::ImageSummary;
 use bollard::service::ContainerSummaryInner;
+use itertools::Itertools;
 use tui::backend::Backend;
 use tui::Frame;
 use tui::layout::{Alignment, Rect};
@@ -22,17 +23,24 @@ impl MutableDrawableComponent for Images {
         let items: Vec<ListItem> = app.images.clone()
             .iter()
             .map(|i| {
-                let images = i.clone().labels;
-                let mut lines = vec![];
+                let summary = i.clone();
+                let images = summary.labels.get_key_value("name");
 
-                for (_, value) in images {
-                    lines.push(Spans::from(Span::styled(
-                        value,
-                        Style::default().add_modifier(Modifier::ITALIC),
-                    )));
+                match images {
+                    None => vec![],
+                    Some(value) => {
+                        let name = value.1.clone();
+                        let mut lines = vec![];
+
+                        lines.push(Spans::from(Span::styled(
+                            name,
+                            Style::default().add_modifier(Modifier::ITALIC),
+                        )));
+                        lines
+                    }
                 }
-                ListItem::new(lines).style(Style::default().fg(Color::Black).bg(Color::White))
-            })
+            }).dedup()
+            .map(|lines| ListItem::new(lines).style(Style::default().fg(Color::Black).bg(Color::White)))
             .collect();
 
         //TODO items is 38 here :/
