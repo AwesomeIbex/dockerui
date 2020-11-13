@@ -19,11 +19,13 @@ use crate::component::util::event::{Event, Events};
 use tokio::sync::Mutex;
 
 mod page;
+mod components;
 mod handler;
 mod app;
 pub mod docker;
 mod style;
 mod component;
+pub mod tab;
 
 fn panic_hook(info: &PanicInfo<'_>) {
     if cfg!(debug_assertions) {
@@ -94,14 +96,14 @@ async fn start_ui(app: &Arc<Mutex<App>>) -> Result<(), Error> {
 
     loop {
         let mut app = app.lock().await;
+        if app.should_quit {
+            break;
+        }
         terminal.draw(|f| {
             &app.draw(f);
         })?;
 
-        let should_break = app.handle_event(events.next())?;
-        if should_break {
-            break;
-        };
+        app.handle_event(events.next())?;
     }
 
     Ok(())

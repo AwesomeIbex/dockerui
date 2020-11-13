@@ -12,6 +12,7 @@ use tui::widgets::{Block, Borders, List, ListItem};
 use crate::component::{MutableDrawableComponent};
 use crate::app::App;
 use crate::component::util::StatefulList;
+use crate::components::MutableDrawableComponent;
 
 pub struct Images {
     selected: usize,

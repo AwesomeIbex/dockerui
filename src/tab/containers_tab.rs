@@ -4,11 +4,11 @@ use tui::Frame;
 use tui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use tui::widgets::{Block, Borders, Paragraph};
 
-use crate::component::{DrawableComponent, MutableDrawableComponent};
 use crate::component::images::Images;
 use crate::component::containers::Containers;
 use crate::component::volumes::Volumes;
 use crate::app::App;
+use crate::components::{DrawableComponent, MutableDrawableComponent};
 
 pub struct ContainersTab();
 

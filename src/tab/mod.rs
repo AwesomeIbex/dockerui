@@ -1,4 +1,4 @@
-use crate::component::DrawableComponent;
+use crate::components::DrawableComponent;
 use tui::backend::Backend;
 use tui::layout::Rect;
 use anyhow::Error;
@@ -7,6 +7,7 @@ use crate::app::App;
 use containers_tab::ContainersTab;
 
 mod containers_tab;
+mod docker;
 
 pub enum Tab {
     Containers,

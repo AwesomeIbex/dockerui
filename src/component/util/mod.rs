@@ -4,7 +4,7 @@ use rand::distributions::{Distribution, Uniform};
 use rand::rngs::ThreadRng;
 use tui::widgets::ListState;
 pub use event::Config;
-use crate::component::tab::Tab;
+use crate::tab::Tab;
 use std::borrow::Borrow;
 
 #[derive(Clone)]

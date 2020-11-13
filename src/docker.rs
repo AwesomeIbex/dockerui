@@ -68,6 +68,7 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
     while let Ok(event) = io_rx.recv() {
         log::debug!("Received event in loop {:?}", event);
         match event {
+            //TODO these will change to then update the widgets data not the app
             IOEvent::RefreshContainers => {
                 let containers = get_containers().await;
                 match containers {

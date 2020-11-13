@@ -9,10 +9,10 @@ use tui::backend::Backend;
 use tui::layout::{Direction, Margin, Rect};
 use tui::widgets::Tabs;
 
-use crate::component::DrawableComponent;
+use crate::components::DrawableComponent;
 use crate::component::containers::Containers;
 use crate::component::images::Images;
-use crate::component::tab::get_tabs;
+use crate::tab::get_tabs;
 use crate::component::util::event::Event;
 use crate::component::util::TabsState;
 use crate::component::volumes::Volumes;
@@ -21,7 +21,7 @@ use crate::docker::IOEvent;
 use crate::style::{SharedTheme, Theme};
 
 pub struct App {
-    should_quit: bool,
+    pub(crate) should_quit: bool,
     theme: SharedTheme,
     tab_state: TabsState,
     selected_tab: usize,
@@ -82,7 +82,7 @@ impl App {
         }
     }
 
-    pub fn handle_event(&mut self, event: Result<Event<Key>, mpsc::RecvError>) -> Result<bool, Error> {
+    pub fn handle_event(&mut self, event: Result<Event<Key>, mpsc::RecvError>) -> Result<(), Error> {
         let event = event?;
         match event {
             Event::Input(input) => match input {
@@ -110,11 +110,7 @@ impl App {
                 self.update();
             }
         }
-        return if self.should_quit {
-            Ok(true)
-        } else {
-            Ok(false)
-        };
+        Ok(())
     }
 
     pub fn get_default_chunks(&self, size: Rect) -> Vec<Rect> {
@@ -131,6 +127,8 @@ impl App {
         let block = Block::default().style(Style::default().bg(Color::Black).fg(Color::LightMagenta));
         f.render_widget(block, size);
         self.draw_tab_bar(f, chunks[0]);
+
+        //TODO this will change with architecture and just take the current tab, draw it
         let tab = self.tab_state.get_current_tab();
         if let Err(error) = tab.draw(f, chunks[1], self) {
             log::error!("There was an error {:?}", error)

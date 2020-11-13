@@ -9,6 +9,7 @@ use bollard::service::ContainerSummaryInner;
 use tui::style::{Style, Modifier, Color};
 use tui::text::{Span, Spans};
 use crate::app::App;
+use crate::components::MutableDrawableComponent;
 
 pub struct Containers {
     selected: usize,
