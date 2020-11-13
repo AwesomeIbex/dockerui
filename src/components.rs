@@ -12,8 +12,7 @@ pub trait DrawableComponent {
     fn draw<B: Backend>(
         &self,
         f: &mut Frame<B>,
-        rect: Rect,
-        app: &App
+        rect: Rect
     ) -> Result<(), Error>;
 }
 
@@ -21,7 +20,6 @@ pub trait MutableDrawableComponent {
     fn draw<B: Backend>(
         &mut self,
         f: &mut Frame<B>,
-        rect: Rect,
-        app: &App
+        rect: Rect
     ) -> Result<(), Error>;
 }

@@ -1,4 +1,3 @@
-use crate::component::{DrawableComponent, MutableDrawableComponent};
 use tui::layout::{Rect, Alignment};
 use tui::Frame;
 use anyhow::Error;
@@ -16,8 +15,9 @@ pub struct Containers {
     items: StatefulList<ContainerSummaryInner>
 }
 impl MutableDrawableComponent for Containers {
-    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect, app: &App) -> Result<(), Error> {
-        let items: Vec<ListItem> = app.container_data
+    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect) -> Result<(), Error> {
+        let items: Vec<ListItem> = self.items
+            .items
             .iter()
             .map(|i| {
                 let names = i.names.as_ref().unwrap();
@@ -33,7 +33,7 @@ impl MutableDrawableComponent for Containers {
             })
             .collect();
 
-        let items = List::new(items)
+        let list = List::new(items)
             .block(Block::default().borders(Borders::ALL).title("Containers"))
             .highlight_style(
                 Style::default()
@@ -41,7 +41,7 @@ impl MutableDrawableComponent for Containers {
                     .add_modifier(Modifier::BOLD),
             )
             .highlight_symbol(">> ");
-        f.render_stateful_widget(items, rect, &mut self.items.state);
+        f.render_stateful_widget(list, rect, &mut self.items.state); //TODO i think this is wrong
 
         Ok(())
     }
@@ -52,6 +52,12 @@ impl Containers {
         Containers {
             selected: 0,
             items: StatefulList::new()
+        }
+    }
+    pub fn new_with_items(data: Vec<ContainerSummaryInner>) -> Containers {
+        Containers {
+            selected: 0,
+            items: StatefulList::with_items(data)
         }
     }
 }

@@ -57,7 +57,6 @@ impl Iterator for SinSignal {
     }
 }
 
-#[derive(Debug, Default)]
 pub struct TabsState {
     pub tabs: Vec<Tab>,
     pub index: usize,

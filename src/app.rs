@@ -26,7 +26,6 @@ pub struct App {
     tab_state: TabsState,
     selected_tab: usize,
     selected_pane: Pane,
-    pub container_data: Vec<ContainerSummaryInner>,
     pub image_data: Vec<ImageSummary>,
     pub volume_data: Vec<Volume>,
     containers_widget: Option<Containers>,
@@ -54,7 +53,6 @@ impl App {
             tab_state: TabsState::new(tabs), //Build tab from dynamic list TODO
             theme,
             selected_tab: 0,
-            container_data: vec![],
             image_data: vec![],
             volume_data: vec![],
             containers_widget: Option::None,
@@ -130,7 +128,7 @@ impl App {
 
         //TODO this will change with architecture and just take the current tab, draw it
         let tab = self.tab_state.get_current_tab();
-        if let Err(error) = tab.draw(f, chunks[1], self) {
+        if let Err(error) = tab.draw(f, chunks[1]) {
             log::error!("There was an error {:?}", error)
         }
     }

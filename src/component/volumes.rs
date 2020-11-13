@@ -9,7 +9,6 @@ use tui::style::{Color, Modifier, Style};
 use tui::text::{Span, Spans};
 use tui::widgets::{Block, Borders, List, ListItem};
 
-use crate::component::{MutableDrawableComponent};
 use crate::app::App;
 use crate::component::util::StatefulList;
 use crate::components::MutableDrawableComponent;
@@ -19,8 +18,8 @@ pub struct Volumes {
     items: StatefulList<Volume>,
 }
 impl MutableDrawableComponent for Volumes {
-    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect, app: &App) -> Result<(), Error> {
-        let mut names = Volumes::filter_names(app);
+    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect) -> Result<(), Error> {
+        let mut names = self.filter_names();
         names.dedup();
 
         let items = Volumes::map_to_list_items(&names);
@@ -46,10 +45,15 @@ impl Volumes {
             items: StatefulList::new()
         }
     }
+    pub fn new_with_items(data: Vec<Volume>) -> Volumes {
+        Volumes {
+            selected: 0,
+            items: StatefulList::with_items(data)
+        }
+    }
 
-
-    fn filter_names(app: &App) -> Vec<String> {
-        let names: Vec<String> = app.volume_data.clone()
+    fn filter_names(&self) -> Vec<String> {
+        let names: Vec<String> = self.items.items.clone()
             .iter()
             .map(|i| {
                 let summary = i.clone();

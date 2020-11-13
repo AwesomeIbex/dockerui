@@ -75,7 +75,7 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
                     Ok(containers) => {
                         let mut app = app.lock().await;
                         log::debug!("Containers: {:?}", containers);
-                        app.container_data = containers;
+                        // app.container_data = containers; TODO
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving containers, {}", err);
