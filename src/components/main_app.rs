@@ -26,10 +26,18 @@ pub struct MainApp {
     tab_state: TabsState,
     theme: SharedTheme,
     selected_tab: usize,
+    selected_pane: Pane,
     pub containers: Vec<ContainerSummaryInner>,
     pub images: Vec<ImageSummary>,
     pub volumes: Vec<Volume>,
     tx: Sender<docker::IOEvent>
+}
+
+enum Pane {
+    Containers,
+    Images,
+    Volumes,
+    Logs
 }
 
 impl MainApp {
@@ -39,6 +47,7 @@ impl MainApp {
         let tabs = get_tabs();
 
         MainApp {
+            selected_pane: Pane::Containers,
             should_quit: false,
             tab_state: TabsState::new(tabs), //Build tabs from dynamic list TODO
             theme,
@@ -76,17 +85,19 @@ impl MainApp {
                 Key::Char(c) => {
                     self.on_key(c);
                 }
-                Key::Down => {}
+                Key::Down => {
+                   self.tab_state.get_current_tab().handle_event();
+                }
                 Key::Up => {}
-                Key::Right => {
+                Key::PageDown => {
                     self.tab_state.next();
                     self.selected_tab = self.tab_state.index;
                 },
-                Key::Left => {
+                Key::PageUp => {
                     self.tab_state.previous();
                     self.selected_tab = self.tab_state.index;
                 },
-                Key::Esc => {
+                Key::Backspace | Key::Esc => {
                     self.should_quit = true;
                 }
                 _ => {}
@@ -115,19 +126,11 @@ impl MainApp {
         let chunks = self.get_default_chunks(size);
         let block = Block::default().style(Style::default().bg(Color::Black).fg(Color::LightMagenta));
         f.render_widget(block, size);
-
         self.draw_tab_bar(f, chunks[0]);
-
-
-        // TODO Get each tab title from the tab itself
         let tab = self.tab_state.get_current_tab();
-        let result = tab.draw(f, chunks[1], self);
-        if result.is_err() {
-            //TODO change to err crate
-            println!("There was an error {:?}", result)
+        if let Err(error) = tab.draw(f, chunks[1], self) {
+            log::error!("There was an error {:?}", error)
         }
-        // let inner = Block::default().title(tab.get_title()).borders(Borders::ALL);
-        // f.render_widget(inner, chunks[1]);
     }
 
     fn draw_tab_bar<B: Backend>(&self, f: &mut Frame<B>, r: Rect) {
@@ -137,14 +140,15 @@ impl MainApp {
         });
 
         let tabs = self
-            .tab_state.tabs
+            .tab_state
+            .tabs
             .iter()
             .map(|e| e.get_title())
             .map(|t| {
                 let (first, rest) = t.split_at(1);
                 Spans::from(vec![
-                    Span::styled(first, Style::default().fg(Color::Yellow)),
-                    Span::styled(rest, Style::default().fg(Color::Green)),
+                    Span::styled(first, Style::default().fg(Color::Red)),
+                    Span::styled(rest, Style::default().fg(Color::DarkGray)),
                 ])
             })
             .collect();
