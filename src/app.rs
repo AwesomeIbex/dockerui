@@ -1,70 +1,66 @@
-use std::rc::Rc;
-use std::sync::{mpsc, Arc};
+use std::sync::{Arc, mpsc};
+use std::sync::mpsc::Sender;
 
-use anyhow::anyhow;
 use anyhow::Error;
-use backtrace::Backtrace;
-use scopeguard::defer;
-use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
-use tui::{backend::TermionBackend, Frame, layout::{Constraint, Layout}, style::{Color, Modifier, Style}, Terminal, text::{Span, Spans}, widgets::{Block, Borders, Row, Table, TableState}};
+use bollard::service::{ContainerSummaryInner, ImageSummary, Volume};
+use termion::{event::Key};
+use tui::{Frame, layout::{Constraint, Layout}, style::{Color, Style}, Terminal, text::{Span, Spans}, widgets::{Block, Borders, Row, Table, TableState}};
 use tui::backend::Backend;
 use tui::layout::{Direction, Margin, Rect};
-use tui::widgets::canvas::{Canvas, Map, MapResolution, Rectangle};
 use tui::widgets::Tabs;
-use crate::components::util::event::Event;
-use crate::components::util::TabsState;
-use crate::style::{SharedTheme, Theme};
-use crate::components::{DrawableComponent};
-use crate::components::tabs::get_tabs;
-use bollard::service::{ContainerSummaryInner, ImageSummary, Volume};
-use std::sync::mpsc::Sender;
+
+use crate::component::DrawableComponent;
+use crate::component::containers::Containers;
+use crate::component::images::Images;
+use crate::component::tab::get_tabs;
+use crate::component::util::event::Event;
+use crate::component::util::TabsState;
+use crate::component::volumes::Volumes;
 use crate::docker;
 use crate::docker::IOEvent;
-use crate::components::containers::Containers;
-use crate::components::volumes::Volumes;
-use crate::components::images::Images;
+use crate::style::{SharedTheme, Theme};
 
-pub struct MainApp {
+pub struct App {
     should_quit: bool,
-    tab_state: TabsState,
     theme: SharedTheme,
+    tab_state: TabsState,
     selected_tab: usize,
     selected_pane: Pane,
-    pub containers: Vec<ContainerSummaryInner>,
-    pub images: Vec<ImageSummary>,
-    pub volumes: Vec<Volume>,
-    tx: Sender<docker::IOEvent>,
+    pub container_data: Vec<ContainerSummaryInner>,
+    pub image_data: Vec<ImageSummary>,
+    pub volume_data: Vec<Volume>,
     containers_widget: Option<Containers>,
     images_widget: Option<Images>,
-    volumes_widget: Option<Volumes>
+    volumes_widget: Option<Volumes>,
+    tx: Sender<docker::IOEvent>,
 }
 
 enum Pane {
     Containers,
     Images,
     Volumes,
-    Logs
+    Logs,
 }
 
-impl MainApp {
-    pub fn new(tx: Sender<docker::IOEvent>) -> MainApp {
+impl App {
+    pub fn new(tx: Sender<docker::IOEvent>) -> App {
         let theme = Arc::new(Theme::init());
 
         let tabs = get_tabs();
 
-        MainApp {
+        App {
             selected_pane: Pane::Containers,
             should_quit: false,
-            tab_state: TabsState::new(tabs), //Build tabs from dynamic list TODO
+            tab_state: TabsState::new(tabs), //Build tab from dynamic list TODO
             theme,
             selected_tab: 0,
-            containers: vec![],
-            images: vec![],
-            volumes: vec![],
+            container_data: vec![],
+            image_data: vec![],
+            volume_data: vec![],
             containers_widget: Option::None,
             volumes_widget: Option::None,
             images_widget: Option::None,
-            tx
+            tx,
         }
     }
 
@@ -81,7 +77,6 @@ impl MainApp {
         match c {
             'q' | 'x' => {
                 self.should_quit = true;
-
             }
             _ => {}
         }
@@ -95,17 +90,17 @@ impl MainApp {
                     self.on_key(c);
                 }
                 Key::Down => {
-                   self.tab_state.get_current_tab();
+                    self.tab_state.get_current_tab();
                 }
                 Key::Up => {}
                 Key::PageDown => {
                     self.tab_state.next();
                     self.selected_tab = self.tab_state.index;
-                },
+                }
                 Key::PageUp => {
                     self.tab_state.previous();
                     self.selected_tab = self.tab_state.index;
-                },
+                }
                 Key::Backspace | Key::Esc => {
                     self.should_quit = true;
                 }

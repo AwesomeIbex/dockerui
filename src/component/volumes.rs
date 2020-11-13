@@ -9,16 +9,16 @@ use tui::style::{Color, Modifier, Style};
 use tui::text::{Span, Spans};
 use tui::widgets::{Block, Borders, List, ListItem};
 
-use crate::components::{MutableDrawableComponent};
-use crate::components::main_app::MainApp;
-use crate::components::util::StatefulList;
+use crate::component::{MutableDrawableComponent};
+use crate::app::App;
+use crate::component::util::StatefulList;
 
 pub struct Volumes {
     selected: usize,
     items: StatefulList<Volume>,
 }
 impl MutableDrawableComponent for Volumes {
-    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect, app: &MainApp) -> Result<(), Error> {
+    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect, app: &App) -> Result<(), Error> {
         let mut names = Volumes::filter_names(app);
         names.dedup();
 
@@ -47,8 +47,8 @@ impl Volumes {
     }
 
 
-    fn filter_names(app: &MainApp) -> Vec<String> {
-        let names: Vec<String> = app.volumes.clone()
+    fn filter_names(app: &App) -> Vec<String> {
+        let names: Vec<String> = app.volume_data.clone()
             .iter()
             .map(|i| {
                 let summary = i.clone();

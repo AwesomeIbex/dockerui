@@ -1,22 +1,22 @@
-use crate::components::{DrawableComponent, MutableDrawableComponent};
+use crate::component::{DrawableComponent, MutableDrawableComponent};
 use tui::layout::{Rect, Alignment};
 use tui::Frame;
 use anyhow::Error;
 use tui::backend::Backend;
 use tui::widgets::{Paragraph, Block, Borders, ListItem, List};
-use crate::components::util::StatefulList;
+use crate::component::util::StatefulList;
 use bollard::service::ContainerSummaryInner;
 use tui::style::{Style, Modifier, Color};
 use tui::text::{Span, Spans};
-use crate::components::main_app::MainApp;
+use crate::app::App;
 
 pub struct Containers {
     selected: usize,
     items: StatefulList<ContainerSummaryInner>
 }
 impl MutableDrawableComponent for Containers {
-    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect, app: &MainApp) -> Result<(), Error> {
-        let items: Vec<ListItem> = app.containers
+    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect, app: &App) -> Result<(), Error> {
+        let items: Vec<ListItem> = app.container_data
             .iter()
             .map(|i| {
                 let names = i.names.as_ref().unwrap();

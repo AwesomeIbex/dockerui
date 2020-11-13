@@ -10,24 +10,20 @@ use std::time::Duration;
 use anyhow::anyhow;
 use anyhow::Error;
 use backtrace::Backtrace;
-use clap::App;
-use scopeguard::defer;
-use termion::{event::Key, input::MouseTerminal, raw::IntoRawMode, screen::AlternateScreen};
-use tui::{backend::TermionBackend, Frame, layout::{Constraint, Layout}, style::{Color, Modifier, Style}, Terminal, text::{Span, Spans}, widgets::{Block, Borders, Row, Table, TableState}};
-use tui::backend::Backend;
-use tui::layout::{Direction, Margin, Rect};
-use tui::widgets::canvas::{Canvas, Map, MapResolution, Rectangle};
-use tui::widgets::Tabs;
+use termion::{input::MouseTerminal, raw::IntoRawMode};
+use tui::{backend::TermionBackend, Terminal};
 
-use crate::components::main_app::MainApp;
-use crate::components::util::Config;
-use crate::components::util::event::{Event, Events};
-use crate::style::{SharedTheme, Theme};
+use app::App;
+use crate::component::util::Config;
+use crate::component::util::event::{Event, Events};
 use tokio::sync::Mutex;
 
+mod page;
+mod handler;
+mod app;
 pub mod docker;
 mod style;
-mod components;
+mod component;
 
 fn panic_hook(info: &PanicInfo<'_>) {
     if cfg!(debug_assertions) {
@@ -67,9 +63,9 @@ async fn main() -> Result<(), Error> {
 
     let (tx, rx) = std::sync::mpsc::channel();
 
-    let app = Arc::new(Mutex::new(MainApp::new(tx)));
-
+    let app = Arc::new(Mutex::new(App::new(tx)));
     let cloned_app = Arc::clone(&app);
+
     std::thread::spawn(move || {
         docker::start_tokio(&app, rx);
     });
@@ -78,7 +74,7 @@ async fn main() -> Result<(), Error> {
     Ok(())
 }
 
-async fn start_ui(app: &Arc<Mutex<MainApp>>) -> Result<(), Error> {
+async fn start_ui(app: &Arc<Mutex<App>>) -> Result<(), Error> {
     let stdout = io::stdout().into_raw_mode()?;
     let stdout = MouseTerminal::from(stdout);
     // let stdout = AlternateScreen::from(stdout); //TODO to enable the tui but with logs
@@ -86,7 +82,6 @@ async fn start_ui(app: &Arc<Mutex<MainApp>>) -> Result<(), Error> {
 
     // set_panic_handlers()?;
 
-    // Setup event handlers
     let config = Config {
         tick_rate: Duration::from_millis(250),
         ..Default::default()

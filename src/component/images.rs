@@ -9,9 +9,9 @@ use tui::style::{Color, Modifier, Style};
 use tui::text::{Span, Spans};
 use tui::widgets::{Block, Borders, List, ListItem};
 
-use crate::components::{MutableDrawableComponent};
-use crate::components::main_app::MainApp;
-use crate::components::util::StatefulList;
+use crate::component::{MutableDrawableComponent};
+use crate::app::App;
+use crate::component::util::StatefulList;
 
 pub struct Images {
     selected: usize,
@@ -19,7 +19,7 @@ pub struct Images {
 }
 
 impl MutableDrawableComponent for Images {
-    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect, app: &MainApp) -> Result<(), Error> {
+    fn draw<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect, app: &App) -> Result<(), Error> {
         let mut names = Images::filter_names(app);
         names.dedup();
 
@@ -48,8 +48,8 @@ impl Images {
         }
     }
 
-    fn filter_names(app: &MainApp) -> Vec<String> {
-        let names: Vec<String> = app.images.clone()
+    fn filter_names(app: &App) -> Vec<String> {
+        let names: Vec<String> = app.image_data.clone()
             .iter()
             .map(|i| {
                 let summary = i.clone();

@@ -10,7 +10,7 @@ use bollard::image::ListImagesOptions;
 use bollard::service::{ContainerSummaryInner, ImageSummary, VolumeListResponse};
 use tokio::time::{Duration, Instant};
 
-use crate::components::main_app::MainApp;
+use crate::app::App;
 use tokio::sync::Mutex;
 use bollard::volume::ListVolumesOptions;
 
@@ -64,7 +64,7 @@ pub enum IOEvent {
 
 // Receive a message and handle it
 #[tokio::main]
-pub async fn start_tokio(app: &Arc<Mutex<MainApp>>, io_rx: std::sync::mpsc::Receiver<IOEvent>) {
+pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver<IOEvent>) {
     while let Ok(event) = io_rx.recv() {
         log::debug!("Received event in loop {:?}", event);
         match event {
@@ -74,7 +74,7 @@ pub async fn start_tokio(app: &Arc<Mutex<MainApp>>, io_rx: std::sync::mpsc::Rece
                     Ok(containers) => {
                         let mut app = app.lock().await;
                         log::debug!("Containers: {:?}", containers);
-                        app.containers = containers;
+                        app.container_data = containers;
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving containers, {}", err);
@@ -87,7 +87,7 @@ pub async fn start_tokio(app: &Arc<Mutex<MainApp>>, io_rx: std::sync::mpsc::Rece
                     Ok(images) => {
                         let mut app = app.lock().await;
                         log::debug!("Images: {:?}", images);
-                        app.images = images;
+                        app.image_data = images;
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving images, {:?}", err);
@@ -100,7 +100,7 @@ pub async fn start_tokio(app: &Arc<Mutex<MainApp>>, io_rx: std::sync::mpsc::Rece
                     Ok(volumes) => {
                         let mut app = app.lock().await;
                         log::debug!("Volumes: {:?}", volumes);
-                        app.volumes = volumes.volumes;
+                        app.volume_data = volumes.volumes;
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving volumes, {:?}", err);
