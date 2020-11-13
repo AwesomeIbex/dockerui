@@ -73,21 +73,21 @@ impl App {
         }
     }
 
-    pub fn on_key(&mut self, c: char) {
-        match c {
-            'q' | 'x' => {
-                self.should_quit = true;
-            }
-            _ => {}
-        }
-    }
-
     pub fn handle_event(&mut self, event: Result<Event<Key>, mpsc::RecvError>) -> Result<(), Error> {
         let event = event?;
         match event {
             Event::Input(input) => match input {
                 Key::Char(c) => {
-                    self.on_key(c);
+                    //Basically handle exit keys but otherwise take the tab and call its event handler TODO
+                    match c {
+                        'q' | 'x' => { //TODO could do a multi-modifier but yolo
+                            self.should_quit = true;
+                        }
+                        _ => {
+                            // get tab
+                            // call handler with key
+                        }
+                    };
                 }
                 Key::Down => {
                     self.tab_state.get_current_tab();
@@ -146,13 +146,7 @@ impl App {
             .tabs
             .iter()
             .map(|e| e.get_title())
-            .map(|t| {
-                let (first, rest) = t.split_at(1);
-                Spans::from(vec![
-                    Span::styled(first, Style::default().fg(Color::Red)),
-                    Span::styled(rest, Style::default().fg(Color::DarkGray)),
-                ])
-            })
+            .map(|t| App::build_bar_spans(t))
             .collect();
 
         f.render_widget(
@@ -168,5 +162,13 @@ impl App {
                 .select(self.selected_tab),
             r,
         );
+    }
+
+    fn build_bar_spans(t: &str) -> Spans {
+        let (first, rest) = t.split_at(1);
+        Spans::from(vec![
+            Span::styled(first, Style::default().fg(Color::Red)),
+            Span::styled(rest, Style::default().fg(Color::DarkGray)),
+        ])
     }
 }

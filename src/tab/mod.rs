@@ -7,7 +7,7 @@ use crate::app::App;
 use containers_tab::ContainersTab;
 
 mod containers_tab;
-mod docker;
+pub mod docker;
 
 pub enum Tab {
     Containers,

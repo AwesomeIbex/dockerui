@@ -14,7 +14,7 @@ use crate::component::util::event::Event;
 use std::sync::mpsc::RecvError;
 use termion::event::Key;
 
-struct DockerTab {
+pub struct DockerTab {
     containers: Option<Containers>, //TODO make these self contained too
     images: Option<Images>,
     volumes: Option<Volumes>,
@@ -79,21 +79,3 @@ impl DrawableComponent for DockerTab {
     }
 }
 
-impl ComponentEventHandler for DockerTab {
-    fn handle(&self, event: Result<Event<Key>, RecvError>) -> Result<(), Error> {
-        let event = event?;
-        match event {
-            Event::Input(input) => match input {
-                Key::Char(c) => {
-                    // TODO self.on_key(c);
-                }
-                Key::Down => {
-                }
-                Key::Up => {}
-                _ => {}
-            },
-            _ => {}
-        };
-        Ok(())
-    }
-}
