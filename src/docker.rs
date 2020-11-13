@@ -7,11 +7,12 @@ use bollard::container::ListContainersOptions;
 use bollard::Docker;
 use bollard::errors::Error;
 use bollard::image::ListImagesOptions;
-use bollard::service::{ContainerSummaryInner, ImageSummary};
+use bollard::service::{ContainerSummaryInner, ImageSummary, VolumeListResponse};
 use tokio::time::{Duration, Instant};
 
 use crate::components::main_app::MainApp;
 use tokio::sync::Mutex;
+use bollard::volume::ListVolumesOptions;
 
 // TODO: could be memoized or static
 #[cfg(unix)]
@@ -20,9 +21,9 @@ fn get_client() -> Result<Docker, Error> {
     client
 }
 
-//TODO send to UI thread https://github.com/daboross/screeps-rs/tree/master/network/src/tokio
 pub async fn get_images() -> Result<Vec<ImageSummary>, Error> {
-    let mut filters: HashMap<&str, Vec<&str>, RandomState> = HashMap::new();
+    let filters: HashMap<&str, Vec<&str>, RandomState> = HashMap::new();
+    // let mut filters: HashMap<&str, Vec<&str>, RandomState> = HashMap::new();
     // filters.insert("dangling", vec!["true"]);
 
     let options = Some(ListImagesOptions {
@@ -33,12 +34,8 @@ pub async fn get_images() -> Result<Vec<ImageSummary>, Error> {
     get_client()?.list_images(options).await
 }
 
-//TODO send to UI thread https://github.com/daboross/screeps-rs/tree/master/network/src/tokio
 pub async fn get_containers() -> Result<Vec<ContainerSummaryInner>, Error> {
-    let mut filters: HashMap<&str, Vec<&str>, RandomState> = HashMap::new();
-    // filters.insert("dangling", vec!["true"]);
-    // filters.insert("status", vec!["running"]);
-
+    let filters: HashMap<&str, Vec<&str>, RandomState> = HashMap::new();
 
     let options = Some(ListContainersOptions {
         all: false,
@@ -48,10 +45,21 @@ pub async fn get_containers() -> Result<Vec<ContainerSummaryInner>, Error> {
     get_client()?.list_containers(options).await
 }
 
+pub async fn get_volumes() -> Result<VolumeListResponse, Error> {
+    let filters: HashMap<&str, Vec<&str>, RandomState> = HashMap::new();
+
+    let options = Some(ListVolumesOptions {
+        filters,
+        ..Default::default()
+    });
+    get_client()?.list_volumes(options).await
+}
+
 #[derive(Debug)]
 pub enum IOEvent {
     RefreshContainers,
     RefreshImages,
+    RefreshVolumes,
 }
 
 // Receive a message and handle it
@@ -83,6 +91,19 @@ pub async fn start_tokio(app: &Arc<Mutex<MainApp>>, io_rx: std::sync::mpsc::Rece
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving images, {:?}", err);
+                    }
+                }
+            }
+            IOEvent::RefreshVolumes => {
+                let volumes = get_volumes().await;
+                match volumes {
+                    Ok(volumes) => {
+                        let mut app = app.lock().await;
+                        log::debug!("Volumes: {:?}", volumes);
+                        app.volumes = volumes.volumes;
+                    }
+                    Err(err) => {
+                        log::error!("There was an error retrieving volumes, {:?}", err);
                     }
                 }
             }

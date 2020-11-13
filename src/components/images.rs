@@ -47,9 +47,7 @@ impl Images {
             items: StatefulList::new(),
         }
     }
-}
 
-impl Images {
     fn filter_names(app: &MainApp) -> Vec<String> {
         let names: Vec<String> = app.images.clone()
             .iter()
@@ -68,9 +66,7 @@ impl Images {
             .collect();
         names
     }
-}
 
-impl Images {
     fn map_to_list_items(names: &Vec<String>) -> Vec<ListItem> {
         let items: Vec<ListItem> = names
             .iter()

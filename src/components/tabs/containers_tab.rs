@@ -49,7 +49,7 @@ impl DrawableComponent for ContainersTab {
         let mut images = Images::new();
         images.draw(f, left_chunks[1], app)?;
 
-        let volumes = Volumes::new();
+        let mut volumes = Volumes::new();
         volumes.draw(f, left_chunks[2], app)?;
 
         Ok(())

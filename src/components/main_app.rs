@@ -16,7 +16,7 @@ use crate::components::util::TabsState;
 use crate::style::{SharedTheme, Theme};
 use crate::components::{DrawableComponent};
 use crate::components::tabs::get_tabs;
-use bollard::service::{ContainerSummaryInner, ImageSummary};
+use bollard::service::{ContainerSummaryInner, ImageSummary, Volume};
 use std::sync::mpsc::Sender;
 use crate::docker;
 use crate::docker::IOEvent;
@@ -28,6 +28,7 @@ pub struct MainApp {
     selected_tab: usize,
     pub containers: Vec<ContainerSummaryInner>,
     pub images: Vec<ImageSummary>,
+    pub volumes: Vec<Volume>,
     tx: Sender<docker::IOEvent>
 }
 
@@ -44,6 +45,7 @@ impl MainApp {
             selected_tab: 0,
             containers: vec![],
             images: vec![],
+            volumes: vec![],
             tx
         }
     }
