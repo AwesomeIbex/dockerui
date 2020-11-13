@@ -10,7 +10,7 @@ use crate::components::containers::Containers;
 use crate::components::volumes::Volumes;
 use crate::components::main_app::MainApp;
 
-pub struct ContainersTab {}
+pub struct ContainersTab();
 
 impl DrawableComponent for ContainersTab {
     fn draw<B: Backend>(&self, f: &mut Frame<B>, rect: Rect, app: &MainApp) -> Result<(), Error> {

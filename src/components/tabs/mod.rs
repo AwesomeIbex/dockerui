@@ -4,6 +4,7 @@ use tui::layout::Rect;
 use anyhow::Error;
 use tui::Frame;
 use crate::components::main_app::MainApp;
+use containers_tab::ContainersTab;
 
 mod containers_tab;
 
@@ -30,7 +31,7 @@ impl Tab {
 impl DrawableComponent for Tab {
     fn draw<B: Backend>(&self, f: &mut Frame<B>, rect: Rect, app: &MainApp) -> Result<(), Error> {
         match self {
-            Tab::Containers => containers_tab::ContainersTab {}.draw(f, rect, app).unwrap(),
+            Tab::Containers => ContainersTab().draw(f, rect, app).unwrap(),
             Tab::Stats => {}
             Tab::Version => {}
         };
