@@ -20,6 +20,9 @@ use bollard::service::{ContainerSummaryInner, ImageSummary, Volume};
 use std::sync::mpsc::Sender;
 use crate::docker;
 use crate::docker::IOEvent;
+use crate::components::containers::Containers;
+use crate::components::volumes::Volumes;
+use crate::components::images::Images;
 
 pub struct MainApp {
     should_quit: bool,
@@ -30,7 +33,10 @@ pub struct MainApp {
     pub containers: Vec<ContainerSummaryInner>,
     pub images: Vec<ImageSummary>,
     pub volumes: Vec<Volume>,
-    tx: Sender<docker::IOEvent>
+    tx: Sender<docker::IOEvent>,
+    containers_widget: Option<Containers>,
+    images_widget: Option<Images>,
+    volumes_widget: Option<Volumes>
 }
 
 enum Pane {
@@ -55,6 +61,9 @@ impl MainApp {
             containers: vec![],
             images: vec![],
             volumes: vec![],
+            containers_widget: Option::None,
+            volumes_widget: Option::None,
+            images_widget: Option::None,
             tx
         }
     }
@@ -86,7 +95,7 @@ impl MainApp {
                     self.on_key(c);
                 }
                 Key::Down => {
-                   self.tab_state.get_current_tab().handle_event();
+                   self.tab_state.get_current_tab();
                 }
                 Key::Up => {}
                 Key::PageDown => {
