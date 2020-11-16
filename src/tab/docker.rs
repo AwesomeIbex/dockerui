@@ -1,7 +1,7 @@
 use std::sync::mpsc::RecvError;
 
 use anyhow::Error;
-use bollard::models::ContainerSummaryInner;
+use bollard::models::{ContainerSummaryInner, Volume, ImageSummary};
 use termion::event::Key;
 use tui::backend::Backend;
 use tui::Frame;
@@ -29,6 +29,13 @@ impl DockerTab {
             containers: Some(Containers::new()), //todo DONT COPY
             images: Some(Images::new()),
             volumes: Some(Volumes::new()),
+        }
+    }
+    pub fn new_with_data(container_data: Vec<ContainerSummaryInner>, image_data: Vec<ImageSummary>, volume_data: Vec<Volume>) -> DockerTab {
+        DockerTab {
+            containers: Some(Containers::new_with_items(container_data)),
+            images: Some(Images::new_with_items(image_data)),
+            volumes: Some(Volumes::new_with_items(volume_data)),
         }
     }
     pub fn get_title(&self) -> String {

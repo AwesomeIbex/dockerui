@@ -66,7 +66,6 @@ pub enum IOEvent {
     RefreshVolumes,
 }
 
-// Receive a message and handle it
 #[tokio::main]
 pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver<IOEvent>) {
     while let Ok(event) = io_rx.recv() {
@@ -79,8 +78,7 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
                     Ok(containers) => {
                         let mut app = app.lock().await;
                         log::debug!("Containers: {:?}", containers);
-                        app.containers_widget = Some(Containers::new_with_items(containers))
-                        // app.container_data = containers; TODO
+                        app.container_data = containers;
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving containers, {}", err);
@@ -93,7 +91,7 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
                     Ok(images) => {
                         let mut app = app.lock().await;
                         log::debug!("Images: {:?}", images);
-                        app.images_widget = Some(Images::new_with_items(images));
+                        app.image_data = images;
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving images, {:?}", err);
@@ -106,7 +104,7 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
                     Ok(volumes) => {
                         let mut app = app.lock().await;
                         log::debug!("Volumes: {:?}", volumes);
-                        app.volumes_widget = Some(Volumes::new_with_items(volumes));
+                        app.volume_data = volumes.volumes;
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving volumes, {:?}", err);

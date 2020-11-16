@@ -4,7 +4,7 @@ use rand::distributions::{Distribution, Uniform};
 use rand::rngs::ThreadRng;
 use tui::widgets::ListState;
 pub use event::Config;
-use crate::tab::{TabVariant, Tab};
+use crate::tab::{TabVariant};
 use std::borrow::Borrow;
 
 #[derive(Clone)]
@@ -58,13 +58,13 @@ impl Iterator for SinSignal {
 }
 
 pub struct TabsState {
-    pub tabs: Vec<dyn Tab>,
+    pub tabs_variants: Vec<TabVariant>,
     pub index: usize,
 }
 
 impl TabsState {
-    pub fn new(tabs: Vec<dyn Tab>) -> TabsState {
-        TabsState { tabs: vec![], index: 0 }
+    pub fn new(tabs_variants: Vec<TabVariant>) -> TabsState {
+        TabsState { tabs_variants, index: 0 }
     }
     pub fn next(&mut self) {
         self.index = (self.index + 1) % self.tabs_variants.len();
@@ -79,9 +79,6 @@ impl TabsState {
     }
     pub fn get_current_tab_variant(&self) -> &TabVariant {
         self.tabs_variants[self.index].borrow()
-    }
-    pub fn get_current_tab(&self) -> &TabVariant {
-        self.tabs[self.index].borrow()
     }
 }
 

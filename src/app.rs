@@ -9,16 +9,16 @@ use tui::backend::Backend;
 use tui::layout::{Direction, Margin, Rect};
 use tui::widgets::Tabs;
 
-use crate::components::DrawableComponent;
 use crate::component::containers::Containers;
 use crate::component::images::Images;
-use crate::tab::{get_tab_variants, TabVariant};
 use crate::component::util::event::Event;
 use crate::component::util::TabsState;
 use crate::component::volumes::Volumes;
-use crate::docker;
-use crate::docker::IOEvent;
+use crate::components::{DrawableComponent, MutableDrawableComponent};
+use crate::network;
+use crate::network::IOEvent;
 use crate::style::{SharedTheme, Theme};
+use crate::tab::{get_tab_variants, TabVariant};
 use crate::tab::docker::DockerTab;
 
 pub struct App {
@@ -27,11 +27,11 @@ pub struct App {
     tab_state: TabsState,
     selected_tab: usize,
     selected_pane: Pane,
-    pub containers_widget: Option<Containers>,
-    pub images_widget: Option<Images>,
-    pub volumes_widget: Option<Volumes>,
+    pub container_data: Vec<ContainerSummaryInner>,
+    pub image_data: Vec<ImageSummary>,
+    pub volume_data: Vec<Volume>,
     pub docker_tab: Option<DockerTab>,
-    tx: Sender<docker::IOEvent>,
+    tx: Sender<network::IOEvent>,
 }
 
 enum Pane {
@@ -55,22 +55,18 @@ enum Pane {
 /// Lifetimes, i want the
 
 impl App {
-    pub fn new(tx: Sender<docker::IOEvent>) -> App {
-        let theme = Arc::new(Theme::init());
-
-
-        let tabs = vec![DockerTab::new()];
+    pub fn new(tx: Sender<network::IOEvent>) -> App {
         App {
             selected_pane: Pane::Containers,
             should_quit: false,
-            tab_state: TabsState::new(tabs), //Build tab from dynamic list TODO
-            theme,
+            tab_state: TabsState::new(get_tab_variants()), //Build tab from dynamic list TODO
+            theme: Arc::new(Theme::init()),
             selected_tab: 0,
-            containers_widget: Option::None,
-            volumes_widget: Option::None,
-            images_widget: Option::None,
             tx,
-            docker_tab: None
+            docker_tab: None,
+            container_data: vec![],
+            image_data: vec![],
+            volume_data: vec![]
         }
     }
 
@@ -147,7 +143,18 @@ impl App {
         let tab = self.tab_state.get_current_tab_variant();
         let tab_rect = chunks[1];
 
-        let tab = tab.draw(f, tab_rect, &self);
+        let tab = match *tab {
+            TabVariant::Docker => {
+                let mut tab = DockerTab::new_with_data(
+                    self.container_data.clone(),
+                    self.image_data.clone(),
+                    self.volume_data.clone()
+                );
+                tab.draw(f, tab_rect)
+            }
+            TabVariant::Stats => Ok(()),
+            TabVariant::Version => Ok(())
+        };
 
         if let Err(error) = tab {
             log::error!("There was an error drawing a tab {:?}", error)

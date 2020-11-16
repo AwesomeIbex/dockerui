@@ -22,7 +22,7 @@ mod page;
 mod components;
 mod handler;
 mod app;
-pub mod docker;
+pub mod network;
 mod style;
 mod component;
 pub mod tab;
@@ -69,7 +69,7 @@ async fn main() -> Result<(), Error> {
     let cloned_app = Arc::clone(&app);
 
     std::thread::spawn(move || {
-        docker::start_tokio(&app, rx);
+        network::start_tokio(&app, rx);
     });
 
     start_ui(&cloned_app).await?;
