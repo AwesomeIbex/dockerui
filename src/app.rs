@@ -32,7 +32,7 @@ pub struct App {
     pub image_data: Vec<ImageSummary>,
     pub volume_data: Vec<Volume>,
     pub container_state: StatefulList<ContainerSummaryInner>,
-    pub s: StatefulList<String>,
+    pub image_state: StatefulList<ImageSummary>,
     tx: Sender<network::IOEvent>,
 }
 
@@ -69,7 +69,7 @@ impl App {
             image_data: vec![],
             volume_data: vec![],
             container_state: StatefulList::new(),
-            s: StatefulList::new()
+            image_state: StatefulList::new()
         }
     }
 
@@ -82,6 +82,20 @@ impl App {
         }
     }
 
+    fn deselect_others(&mut self) {
+        match self.selected_pane {
+            Pane::Containers => {
+                self.image_state.unselect();
+                self.container_state.state.select(Some(0));
+            }
+            Pane::Images => {
+                self.container_state.unselect();
+                self.image_state.state.select(Some(0));
+            }
+            Pane::Volumes => {}
+            Pane::Logs => {}
+        }
+    }
     pub fn handle_event(&mut self, event: Result<Event<Key>, mpsc::RecvError>) -> Result<(), Error> {
         let event = event?;
         match event {
@@ -92,7 +106,14 @@ impl App {
                         'q' | 'x' => { //TODO could do a multi-modifier but yolo
                             self.should_quit = true;
                         }
-                        'j' => self.container_state.next(),
+                        'i' => {
+                            self.selected_pane = Pane::Images;
+                            self.deselect_others()
+                        },
+                        'c' => {
+                            self.selected_pane = Pane::Containers;
+                            self.deselect_others()
+                        },
                         _ => {
                             println!("s")
                             // get tab
@@ -101,10 +122,21 @@ impl App {
                     };
                 }
                 Key::Down => {
-                    self.container_state.next()
+                    match self.selected_pane {
+                        Pane::Containers => self.container_state.next(),
+                        Pane::Images => self.image_state.next(),
+                        Pane::Volumes => {}
+                        Pane::Logs => {}
+                    }
+
                 }
                 Key::Up => {
-                    self.container_state.previous();
+                    match self.selected_pane {
+                        Pane::Containers => self.container_state.previous(),
+                        Pane::Images => self.image_state.previous(),
+                        Pane::Volumes => {}
+                        Pane::Logs => {}
+                    }
                 }
                 Key::PageDown => {
                     self.tab_state.next();
@@ -166,6 +198,11 @@ impl App {
             )
             .split(right_chunks[0]);
 
+        self.draw_containers(f, left_chunks[0]);
+        self.draw_images(f, left_chunks[1]);
+    }
+
+    fn draw_containers<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect) {
         let items: Vec<ListItem> = self.container_state
             .items
             .iter()
@@ -175,11 +212,11 @@ impl App {
 
                 names.iter().for_each(|name| {
                     lines.push(Spans::from(Span::styled(
-                        name,
+                        name.replace("/", ""),
                         Style::default().add_modifier(Modifier::ITALIC),
                     )));
                 });
-                ListItem::new(lines).style(Style::default().fg(Color::White).bg(Color::Black))
+                ListItem::new(lines).style(Style::default().fg(Color::White))
             })
             .collect();
 
@@ -189,9 +226,50 @@ impl App {
                 Style::default()
                     .bg(Color::DarkGray)
                     .add_modifier(Modifier::BOLD),
-            )
-            .highlight_symbol(">> ");
-        f.render_stateful_widget(list, left_chunks[0], &mut self.container_state.state);
+            );
+        f.render_stateful_widget(list, rect, &mut self.container_state.state);
+    }
+    fn draw_images<B: Backend>(&mut self, f: &mut Frame<B>, rect: Rect) {
+        let mut names: Vec<String> = self.image_state.items.clone()
+            .iter()
+            .map(|i| {
+                let summary = i.clone();
+                let images = summary.labels.get_key_value("name");
+
+                match images {
+                    None => String::new(),
+                    Some(value) => {
+                        value.1.clone()
+                    }
+                }
+            })
+            .filter(|name| !name.is_empty())
+            .collect();
+        names.dedup();
+
+        let items: Vec<ListItem> = names
+            .iter()
+            .map(|name| {
+                vec![(Spans::from(Span::styled(
+                    name,
+                    Style::default().add_modifier(Modifier::ITALIC),
+                )))]
+            })
+            .map(|mut lines| {
+                lines.dedup();
+                ListItem::new(lines).style(Style::default().fg(Color::White))
+            })
+            .collect();
+
+        //TODO items is 38 here :/
+        let items = List::new(items)
+            .block(Block::default().borders(Borders::ALL).title("Images"))
+            .highlight_style(
+                Style::default()
+                    .bg(Color::DarkGray)
+                    .add_modifier(Modifier::BOLD),
+            );
+        f.render_stateful_widget(items, rect, &mut self.image_state.state);
     }
 
     fn draw_tab_bar<B: Backend>(&self, f: &mut Frame<B>, r: Rect) {

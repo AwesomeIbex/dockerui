@@ -94,7 +94,10 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
                     Ok(images) => {
                         let mut app = app.lock().await;
                         log::debug!("Images: {:?}", images);
-                        app.image_data = images;
+                        // app.image_data = images;
+                        if app.image_state.items.len() != images.len() {
+                            app.image_state = StatefulList::with_items(images);
+                        }
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving images, {:?}", err);
