@@ -17,6 +17,7 @@ use app::App;
 use crate::component::util::Config;
 use crate::component::util::event::{Event, Events};
 use tokio::sync::Mutex;
+use termion::screen::AlternateScreen;
 
 mod page;
 mod components;
@@ -79,7 +80,7 @@ async fn main() -> Result<(), Error> {
 async fn start_ui(app: &Arc<Mutex<App>>) -> Result<(), Error> {
     let stdout = io::stdout().into_raw_mode()?;
     let stdout = MouseTerminal::from(stdout);
-    // let stdout = AlternateScreen::from(stdout); //TODO to enable the tui but with logs
+    let stdout = AlternateScreen::from(stdout); //TODO to enable the tui but with logs
     let backend = TermionBackend::new(stdout);
 
     // set_panic_handlers()?;

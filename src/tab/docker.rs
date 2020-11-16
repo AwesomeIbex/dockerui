@@ -1,7 +1,7 @@
 use std::sync::mpsc::RecvError;
 
 use anyhow::Error;
-use bollard::models::{ContainerSummaryInner, Volume, ImageSummary};
+use bollard::models::{ContainerSummaryInner, ImageSummary, Volume};
 use termion::event::Key;
 use tui::backend::Backend;
 use tui::Frame;
@@ -18,24 +18,25 @@ use crate::handler::ComponentEventHandler;
 use crate::tab::TabVariant;
 
 pub struct DockerTab {
-    pub containers: Option<Containers>, //TODO make these self contained too
-    pub images: Option<Images>,
-    pub volumes: Option<Volumes>,
+    pub containers: Containers,
+    //TODO make these self contained too
+    pub images: Images,
+    pub volumes: Volumes,
 }
 
 impl DockerTab {
-    pub fn new(&self) -> DockerTab {
+    pub fn new() -> DockerTab {
         DockerTab {
-            containers: Some(Containers::new()), //todo DONT COPY
-            images: Some(Images::new()),
-            volumes: Some(Volumes::new()),
+            containers: Containers::new(), //todo DONT COPY
+            images: Images::new(),
+            volumes: Volumes::new(),
         }
     }
     pub fn new_with_data(container_data: Vec<ContainerSummaryInner>, image_data: Vec<ImageSummary>, volume_data: Vec<Volume>) -> DockerTab {
         DockerTab {
-            containers: Some(Containers::new_with_items(container_data)),
-            images: Some(Images::new_with_items(image_data)),
-            volumes: Some(Volumes::new_with_items(volume_data)),
+            containers: Containers::new_with_items(container_data),
+            images: Images::new_with_items(image_data),
+            volumes: Volumes::new_with_items(volume_data),
         }
     }
     pub fn get_title(&self) -> String {
@@ -74,28 +75,19 @@ impl MutableDrawableComponent for DockerTab {
         f.render_widget(
             Paragraph::new("logs value with some stuff")
                 .block(Block::default().borders(Borders::ALL).title("Logs"))
+                .block(Block::default().borders(Borders::ALL).title("Logs"))
                 .alignment(Alignment::Left),
             right_chunks[1]);
 
-        //TODO these are nasty hacks
-        if self.containers.is_some() {
-            let containers = &mut self.containers;
-            let s: &mut Containers = containers.as_mut().unwrap();
-            s.draw(f, left_chunks[0]);
-            // &containers.draw(f, left_chunks[0])?;
-        }
+        let containers = &mut self.containers;
 
-        if self.images.is_some() {
-            let images = &mut self.images;
-            let s: &mut Images = images.as_mut().unwrap();
-            s.draw(f, left_chunks[1]);
-        }
+        containers.draw(f, left_chunks[0])?;
 
-        if self.volumes.is_some() {
-            let volumes = &mut self.volumes;
-            let s: &mut Volumes = volumes.as_mut().unwrap();
-            s.draw(f, left_chunks[2]);
-        }
+        let images = &mut self.images;
+        images.draw(f, left_chunks[1])?;
+
+        let volumes = &mut self.volumes;
+        volumes.draw(f, left_chunks[2])?;
         Ok(())
     }
 }

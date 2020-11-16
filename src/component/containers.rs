@@ -10,7 +10,8 @@ use tui::text::{Span, Spans};
 use crate::app::App;
 use crate::components::MutableDrawableComponent;
 
-pub struct Containers {
+pub struct
+Containers {
     selected: usize,
     items: StatefulList<ContainerSummaryInner>
 }

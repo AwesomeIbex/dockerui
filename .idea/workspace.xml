@@ -50,7 +50,7 @@
     <property name="cf.first.check.clang-format" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/components" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="language.rust.rustfmt" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -104,7 +104,6 @@
     <option name="runExternalLinterOnTheFly" value="true" />
     <option name="runRustfmtOnSave" value="true" />
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
-    <option name="useRustfmt" value="true" />
     <option name="version" value="2" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -133,10 +132,10 @@
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state width="3364" height="367" key="GridCell.Tab.0.right/0.0.3440.1440@0.0.3440.1440" timestamp="1605308559047" />
-    <state x="1242" y="283" key="SettingsEditor" timestamp="1605304319975">
+    <state x="1240" y="257" key="SettingsEditor" timestamp="1605541190680">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state x="1242" y="283" key="SettingsEditor/0.0.3440.1440@0.0.3440.1440" timestamp="1605304319975" />
+    <state x="1240" y="257" key="SettingsEditor/0.0.3440.1440@0.0.3440.1440" timestamp="1605541190680" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1605304845272">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
@@ -145,10 +144,10 @@
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
     <state x="1611" y="41" width="1135" height="1319" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.3440.1440@0.0.3440.1440" timestamp="1605538239355" />
-    <state x="1402" y="420" width="822" height="590" key="find.popup" timestamp="1605303742630">
+    <state x="1402" y="420" width="822" height="590" key="find.popup" timestamp="1605543805532">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>
-    <state x="1402" y="420" width="822" height="590" key="find.popup/0.0.3440.1440@0.0.3440.1440" timestamp="1605303742630" />
+    <state x="1402" y="420" width="822" height="590" key="find.popup/0.0.3440.1440@0.0.3440.1440" timestamp="1605543805532" />
     <state x="1054" y="580" width="1327" height="202" key="makefile.clean.confirm.dialog" timestamp="1604309267294">
       <screen x="0" y="0" width="3440" height="1440" />
     </state>

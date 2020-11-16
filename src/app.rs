@@ -6,13 +6,13 @@ use bollard::service::{ContainerSummaryInner, ImageSummary, Volume};
 use termion::{event::Key};
 use tui::{Frame, layout::{Constraint, Layout}, style::{Color, Style}, Terminal, text::{Span, Spans}, widgets::{Block, Borders, Row, Table, TableState}};
 use tui::backend::Backend;
-use tui::layout::{Direction, Margin, Rect};
-use tui::widgets::Tabs;
+use tui::layout::{Direction, Margin, Rect, Alignment};
+use tui::widgets::{Tabs, Paragraph, ListItem, List, ListState};
 
 use crate::component::containers::Containers;
 use crate::component::images::Images;
 use crate::component::util::event::Event;
-use crate::component::util::TabsState;
+use crate::component::util::{TabsState, StatefulList};
 use crate::component::volumes::Volumes;
 use crate::components::{DrawableComponent, MutableDrawableComponent};
 use crate::network;
@@ -20,6 +20,7 @@ use crate::network::IOEvent;
 use crate::style::{SharedTheme, Theme};
 use crate::tab::{get_tab_variants, TabVariant};
 use crate::tab::docker::DockerTab;
+use tui::style::Modifier;
 
 pub struct App {
     pub(crate) should_quit: bool,
@@ -30,7 +31,8 @@ pub struct App {
     pub container_data: Vec<ContainerSummaryInner>,
     pub image_data: Vec<ImageSummary>,
     pub volume_data: Vec<Volume>,
-    pub docker_tab: Option<DockerTab>,
+    pub container_state: StatefulList<ContainerSummaryInner>,
+    pub s: StatefulList<String>,
     tx: Sender<network::IOEvent>,
 }
 
@@ -63,10 +65,11 @@ impl App {
             theme: Arc::new(Theme::init()),
             selected_tab: 0,
             tx,
-            docker_tab: None,
             container_data: vec![],
             image_data: vec![],
-            volume_data: vec![]
+            volume_data: vec![],
+            container_state: StatefulList::new(),
+            s: StatefulList::new()
         }
     }
 
@@ -89,16 +92,20 @@ impl App {
                         'q' | 'x' => { //TODO could do a multi-modifier but yolo
                             self.should_quit = true;
                         }
+                        'j' => self.container_state.next(),
                         _ => {
+                            println!("s")
                             // get tab
                             // call handler with key
                         }
                     };
                 }
                 Key::Down => {
-                    self.tab_state.get_current_tab_variant();
+                    self.container_state.next()
                 }
-                Key::Up => {}
+                Key::Up => {
+                    self.container_state.previous();
+                }
                 Key::PageDown => {
                     self.tab_state.next();
                     self.selected_tab = self.tab_state.index;
@@ -110,7 +117,7 @@ impl App {
                 Key::Backspace | Key::Esc => {
                     self.should_quit = true;
                 }
-                _ => {}
+                _ => println!("couldnt match")
             },
             Event::Tick => {
                 self.update();
@@ -127,38 +134,64 @@ impl App {
             .split(size)
     }
 
-    pub fn draw<B: Backend>(&self, f: &mut Frame<B>) {
+    pub fn draw<B: Backend>(&mut self, f: &mut Frame<B>) {
         let size = f.size();
         let chunks = self.get_default_chunks(size);
         let block = Block::default().style(Style::default().bg(Color::Black).fg(Color::LightMagenta));
         f.render_widget(block, size);
-        self.draw_tab_bar(f, chunks[0]);
 
-        //TODO this will change with architecture and just take the current tab
-        //TODO this will change with architecture and just take the current tab
-        //TODO this will change with architecture and just take the current tab
-        //TODO this will change with architecture and just take the current tab
-        //TODO this will change with architecture and just take the current tab
-        //TODO this will change with architecture and just take the current tab
-        let tab = self.tab_state.get_current_tab_variant();
+        self.draw_tab_bar(f, chunks[0]);
         let tab_rect = chunks[1];
 
-        let tab = match *tab {
-            TabVariant::Docker => {
-                let mut tab = DockerTab::new_with_data(
-                    self.container_data.clone(),
-                    self.image_data.clone(),
-                    self.volume_data.clone()
-                );
-                tab.draw(f, tab_rect)
-            }
-            TabVariant::Stats => Ok(()),
-            TabVariant::Version => Ok(())
-        };
+        let right_chunks = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(
+                [
+                    Constraint::Percentage(20),
+                    Constraint::Percentage(80),
+                ]
+                    .as_ref(),
+            )
+            .split(tab_rect);
 
-        if let Err(error) = tab {
-            log::error!("There was an error drawing a tab {:?}", error)
-        }
+        let left_chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(
+                [
+                    Constraint::Percentage(40),
+                    Constraint::Percentage(30),
+                    Constraint::Percentage(30),
+                ]
+                    .as_ref(),
+            )
+            .split(right_chunks[0]);
+
+        let items: Vec<ListItem> = self.container_state
+            .items
+            .iter()
+            .map(|i| {
+                let names = i.names.as_ref().unwrap();
+                let mut lines = vec![];
+
+                names.iter().for_each(|name| {
+                    lines.push(Spans::from(Span::styled(
+                        name,
+                        Style::default().add_modifier(Modifier::ITALIC),
+                    )));
+                });
+                ListItem::new(lines).style(Style::default().fg(Color::White).bg(Color::Black))
+            })
+            .collect();
+
+        let list = List::new(items)
+            .block(Block::default().borders(Borders::ALL).title("Containers"))
+            .highlight_style(
+                Style::default()
+                    .bg(Color::DarkGray)
+                    .add_modifier(Modifier::BOLD),
+            )
+            .highlight_symbol(">> ");
+        f.render_stateful_widget(list, left_chunks[0], &mut self.container_state.state);
     }
 
     fn draw_tab_bar<B: Backend>(&self, f: &mut Frame<B>, r: Rect) {

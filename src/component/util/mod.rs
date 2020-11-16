@@ -113,6 +113,7 @@ impl<T> StatefulList<T> {
             }
             None => 0,
         };
+        println!("i {}", i);
         self.state.select(Some(i));
     }
 

@@ -17,6 +17,7 @@ use crate::component;
 use component::containers::Containers;
 use crate::component::images::Images;
 use crate::component::volumes::Volumes;
+use crate::component::util::StatefulList;
 
 // TODO: could be memoized or static
 #[cfg(unix)]
@@ -78,7 +79,9 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
                     Ok(containers) => {
                         let mut app = app.lock().await;
                         log::debug!("Containers: {:?}", containers);
-                        app.container_data = containers;
+                        if app.container_state.items.len() != containers.len() {
+                            app.container_state = StatefulList::with_items(containers);
+                        }
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving containers, {}", err);
