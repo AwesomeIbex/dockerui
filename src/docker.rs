@@ -13,6 +13,10 @@ use tokio::time::{Duration, Instant};
 use crate::app::App;
 use tokio::sync::Mutex;
 use bollard::volume::ListVolumesOptions;
+use crate::component;
+use component::containers::Containers;
+use crate::component::images::Images;
+use crate::component::volumes::Volumes;
 
 // TODO: could be memoized or static
 #[cfg(unix)]
@@ -75,6 +79,7 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
                     Ok(containers) => {
                         let mut app = app.lock().await;
                         log::debug!("Containers: {:?}", containers);
+                        app.containers_widget = Some(Containers::new_with_items(containers))
                         // app.container_data = containers; TODO
                     }
                     Err(err) => {
@@ -88,7 +93,7 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
                     Ok(images) => {
                         let mut app = app.lock().await;
                         log::debug!("Images: {:?}", images);
-                        app.image_data = images;
+                        app.images_widget = Some(Images::new_with_items(images));
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving images, {:?}", err);
@@ -101,7 +106,7 @@ pub async fn start_tokio(app: &Arc<Mutex<App>>, io_rx: std::sync::mpsc::Receiver
                     Ok(volumes) => {
                         let mut app = app.lock().await;
                         log::debug!("Volumes: {:?}", volumes);
-                        app.volume_data = volumes.volumes;
+                        app.volumes_widget = Some(Volumes::new_with_items(volumes));
                     }
                     Err(err) => {
                         log::error!("There was an error retrieving volumes, {:?}", err);

@@ -12,13 +12,14 @@ use tui::widgets::Tabs;
 use crate::components::DrawableComponent;
 use crate::component::containers::Containers;
 use crate::component::images::Images;
-use crate::tab::{get_tabs, Tab};
+use crate::tab::{get_tab_variants, TabVariant};
 use crate::component::util::event::Event;
 use crate::component::util::TabsState;
 use crate::component::volumes::Volumes;
 use crate::docker;
 use crate::docker::IOEvent;
 use crate::style::{SharedTheme, Theme};
+use crate::tab::docker::DockerTab;
 
 pub struct App {
     pub(crate) should_quit: bool,
@@ -30,7 +31,6 @@ pub struct App {
     pub images_widget: Option<Images>,
     pub volumes_widget: Option<Volumes>,
     pub docker_tab: Option<DockerTab>,
-    volumes_widget: Option<Volumes>,
     tx: Sender<docker::IOEvent>,
 }
 
@@ -58,20 +58,19 @@ impl App {
     pub fn new(tx: Sender<docker::IOEvent>) -> App {
         let theme = Arc::new(Theme::init());
 
-        let tabs = get_tabs();
 
+        let tabs = vec![DockerTab::new()];
         App {
             selected_pane: Pane::Containers,
             should_quit: false,
             tab_state: TabsState::new(tabs), //Build tab from dynamic list TODO
             theme,
             selected_tab: 0,
-            image_data: vec![],
-            volume_data: vec![],
             containers_widget: Option::None,
             volumes_widget: Option::None,
             images_widget: Option::None,
             tx,
+            docker_tab: None
         }
     }
 
@@ -101,7 +100,7 @@ impl App {
                     };
                 }
                 Key::Down => {
-                    self.tab_state.get_current_tab();
+                    self.tab_state.get_current_tab_variant();
                 }
                 Key::Up => {}
                 Key::PageDown => {
@@ -145,13 +144,11 @@ impl App {
         //TODO this will change with architecture and just take the current tab
         //TODO this will change with architecture and just take the current tab
         //TODO this will change with architecture and just take the current tab
-        let tab = self.tab_state.get_current_tab();
+        let tab = self.tab_state.get_current_tab_variant();
         let tab_rect = chunks[1];
-        let tab = match tab {
-            Tab::Containers => tab.draw(f, tab_rect), // draw this tab from app state
-            Tab::Stats => Err(anyhow::anyhow!("")),
-            Tab::Version => Err(anyhow::anyhow!(""))
-        };
+
+        let tab = tab.draw(f, tab_rect, &self);
+
         if let Err(error) = tab {
             log::error!("There was an error drawing a tab {:?}", error)
         }
@@ -165,7 +162,7 @@ impl App {
 
         let tabs = self
             .tab_state
-            .tabs
+            .tabs_variants
             .iter()
             .map(|e| e.get_title())
             .map(|t| App::build_bar_spans(t))

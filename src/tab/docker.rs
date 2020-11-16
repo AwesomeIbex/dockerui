@@ -15,25 +15,27 @@ use crate::component::util::event::Event;
 use crate::component::volumes::Volumes;
 use crate::components::{DrawableComponent, MutableDrawableComponent};
 use crate::handler::ComponentEventHandler;
+use crate::tab::TabVariant;
 
 pub struct DockerTab {
-    containers: Option<Containers>, //TODO make these self contained too
-    pub container_data: Vec<ContainerSummaryInner>,
-    images: Option<Images>,
-    volumes: Option<Volumes>,
+    pub containers: Option<Containers>, //TODO make these self contained too
+    pub images: Option<Images>,
+    pub volumes: Option<Volumes>,
 }
 
 impl DockerTab {
     pub fn new(&self) -> DockerTab {
         DockerTab {
-            container_data: vec![],
-            containers: Some(Containers::new_with_items(self.container_data.clone())), //todo DONT COPY
+            containers: Some(Containers::new()), //todo DONT COPY
             images: Some(Images::new()),
             volumes: Some(Volumes::new()),
         }
     }
     pub fn get_title(&self) -> String {
         String::from("Docker")
+    }
+    pub fn get_variant(&self) -> TabVariant {
+        TabVariant::Docker
     }
 }
 

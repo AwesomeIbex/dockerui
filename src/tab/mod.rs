@@ -1,38 +1,32 @@
-use crate::components::DrawableComponent;
+use crate::components::{DrawableComponent, MutableDrawableComponent};
 use tui::backend::Backend;
 use tui::layout::Rect;
 use anyhow::Error;
 use tui::Frame;
 use crate::app::App;
+use crate::tab::docker::DockerTab;
 
 pub mod docker;
 
-pub enum Tab {
-    Containers,
+pub enum TabVariant {
+    Docker,
     Stats,
     Version
 }
 
-pub fn get_tabs() -> Vec<Tab> {
-    vec![Tab::Containers, Tab::Stats, Tab::Version]
-}
-
-impl Tab {
+impl TabVariant {
     pub fn get_title(&self) -> &'static str {
         match self {
-            Tab::Containers => "Containers",
-            Tab::Stats => "Stats",
-            Tab::Version => "Version",
+            TabVariant::Docker => "Containers",
+            TabVariant::Stats => "Stats",
+            TabVariant::Version => "Version",
         }
     }
-}
-
-impl DrawableComponent for Tab {
-    fn draw<B: Backend>(&self, f: &mut Frame<B>, rect: Rect,) -> Result<(), Error> {
+    pub(crate) fn draw<B: Backend>(&self, f: &mut Frame<B>, rect: Rect, app: &App) -> Result<(), Error> {
         match self {
-            Tab::Containers => {},
-            Tab::Stats => {}
-            Tab::Version => {}
+            TabVariant::Docker => app.docker_tab.unwrap().draw(f, rect),
+            TabVariant::Stats => Ok(()),
+            TabVariant::Version => Ok(())
         };
         Ok(())
     }
