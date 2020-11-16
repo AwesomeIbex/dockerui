@@ -6,8 +6,6 @@ use tui::backend::Backend;
 use tui::Frame;
 use tui::layout::Rect;
 
-use crate::app::App;
-
 pub trait DrawableComponent {
     fn draw<B: Backend>(
         &self,

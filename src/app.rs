@@ -12,7 +12,7 @@ use tui::widgets::Tabs;
 use crate::components::DrawableComponent;
 use crate::component::containers::Containers;
 use crate::component::images::Images;
-use crate::tab::get_tabs;
+use crate::tab::{get_tabs, Tab};
 use crate::component::util::event::Event;
 use crate::component::util::TabsState;
 use crate::component::volumes::Volumes;
@@ -127,9 +127,20 @@ impl App {
         self.draw_tab_bar(f, chunks[0]);
 
         //TODO this will change with architecture and just take the current tab, draw it
+        //TODO this will change with architecture and just take the current tab, draw it
+        //TODO this will change with architecture and just take the current tab, draw it
+        //TODO this will change with architecture and just take the current tab, draw it
+        //TODO this will change with architecture and just take the current tab, draw it
+        //TODO this will change with architecture and just take the current tab, draw it
         let tab = self.tab_state.get_current_tab();
-        if let Err(error) = tab.draw(f, chunks[1]) {
-            log::error!("There was an error {:?}", error)
+        let tab_rect = chunks[1];
+        let tab = match tab {
+            Tab::Containers => tab.draw(f, tab_rect), // draw this tab from app state
+            Tab::Stats => Err(anyhow::anyhow!("")),
+            Tab::Version => Err(anyhow::anyhow!(""))
+        };
+        if let Err(error) = tab {
+            log::error!("There was an error drawing a tab {:?}", error)
         }
     }
 

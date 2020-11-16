@@ -68,6 +68,7 @@ impl MutableDrawableComponent for DockerTab {
                 .alignment(Alignment::Left),
             right_chunks[1]);
 
+        //TODO these are nasty hacks
         if self.containers.is_some() {
             let containers = &mut self.containers;
             let s: &mut Containers = containers.as_mut().unwrap();
