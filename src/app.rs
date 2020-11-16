@@ -26,10 +26,10 @@ pub struct App {
     tab_state: TabsState,
     selected_tab: usize,
     selected_pane: Pane,
-    pub image_data: Vec<ImageSummary>,
-    pub volume_data: Vec<Volume>,
-    containers_widget: Option<Containers>,
-    images_widget: Option<Images>,
+    pub containers_widget: Option<Containers>,
+    pub images_widget: Option<Images>,
+    pub volumes_widget: Option<Volumes>,
+    pub docker_tab: Option<DockerTab>,
     volumes_widget: Option<Volumes>,
     tx: Sender<docker::IOEvent>,
 }
@@ -40,6 +40,19 @@ enum Pane {
     Volumes,
     Logs,
 }
+
+/// Drawing:
+/// Draw main app
+/// Take the current tab and then draw
+/// Tab draws its components
+///
+/// Events
+/// Handle main event
+/// Take the current tab and then handle event
+/// Tab matches against its panes to determine what event to handle for each componenty
+/// component may update tabs pane
+///
+/// Lifetimes, i want the
 
 impl App {
     pub fn new(tx: Sender<docker::IOEvent>) -> App {
@@ -126,12 +139,12 @@ impl App {
         f.render_widget(block, size);
         self.draw_tab_bar(f, chunks[0]);
 
-        //TODO this will change with architecture and just take the current tab, draw it
-        //TODO this will change with architecture and just take the current tab, draw it
-        //TODO this will change with architecture and just take the current tab, draw it
-        //TODO this will change with architecture and just take the current tab, draw it
-        //TODO this will change with architecture and just take the current tab, draw it
-        //TODO this will change with architecture and just take the current tab, draw it
+        //TODO this will change with architecture and just take the current tab
+        //TODO this will change with architecture and just take the current tab
+        //TODO this will change with architecture and just take the current tab
+        //TODO this will change with architecture and just take the current tab
+        //TODO this will change with architecture and just take the current tab
+        //TODO this will change with architecture and just take the current tab
         let tab = self.tab_state.get_current_tab();
         let tab_rect = chunks[1];
         let tab = match tab {
